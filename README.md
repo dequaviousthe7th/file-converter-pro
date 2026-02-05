@@ -20,16 +20,10 @@ A modern, professional desktop application for converting files between PDF, Wor
 ## 🖼️ Screenshots
 
 ### Simple UI (WinRAR Style)
-<!-- Add screenshot here: ![Simple UI](screenshots/simple_ui.png) -->
-```
-[SIMPLE UI SCREENSHOT PLACEHOLDER]
-```
+![Simple UI](screenshot_simple.png)
 
 ### Advanced UI (Modern Dark Theme)
-<!-- Add screenshot here: ![Advanced UI](screenshots/advanced_ui.png) -->
-```
-[ADVANCED UI SCREENSHOT PLACEHOLDER]
-```
+![Advanced UI](screenshot_advanced.png)
 
 ## 🚀 Quick Start
 
