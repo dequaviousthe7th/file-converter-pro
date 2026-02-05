@@ -37,9 +37,9 @@ class SimpleConverter:
     def __init__(self, root):
         self.root = root
         self.root.title("File Converter Pro")
-        self.root.geometry("140x610")
+        self.root.geometry("400x500")
         self.root.resizable(True, True)
-        self.root.minsize(120, 510)
+        self.root.minsize(350, 500)
         
         self.center_window()
         
@@ -47,6 +47,7 @@ class SimpleConverter:
         self.target_format = None
         self.conversion_thread = None
         self.stop_requested = False
+        self.killed = False  # Track if conversion was killed
         self.output_dir = Path(__file__).parent / "converted"
         self.output_dir.mkdir(exist_ok=True)
         
@@ -54,7 +55,7 @@ class SimpleConverter:
         
     def center_window(self):
         self.root.update_idletasks()
-        w, h = 500, 420
+        w, h = 400, 500
         x = (self.root.winfo_screenwidth() // 2) - (w // 2)
         y = (self.root.winfo_screenheight() // 2) - (h // 2)
         self.root.geometry(f'{w}x{h}+{x}+{y}')
@@ -92,7 +93,7 @@ class SimpleConverter:
         main.bind("<Configure>", lambda e: (configure_canvas(e), update_scrollbar(e)))
         
         # Create window inside canvas - WIDTH MUST MATCH ROOT
-        canvas_window = canvas.create_window((0, 0), window=main, anchor="nw", width=140)
+        canvas_window = canvas.create_window((0, 0), window=main, anchor="nw", width=400)
         
         # Update scroll region when frame changes size
         def configure_canvas(event):
@@ -155,9 +156,10 @@ class SimpleConverter:
         self.file_info = ttk.Label(file_frame, text="No file selected", foreground="gray")
         self.file_info.pack(anchor="w", pady=(5, 0))
         
-        # Format selection
-        self.format_frame = ttk.LabelFrame(main, text="Convert To", padding="10")
+        # Format selection - FIXED HEIGHT to prevent expansion
+        self.format_frame = ttk.LabelFrame(main, text="Convert To", padding="10", height=90)
         self.format_frame.pack(fill="x", pady=(0, 10))
+        self.format_frame.pack_propagate(False)  # Prevent frame from resizing to fit content
         
         self.format_var = tk.StringVar()
         self.format_buttons = []
@@ -174,8 +176,8 @@ class SimpleConverter:
         self.progress.pack(fill="x", pady=(0, 5))
         self.progress["value"] = 0
         
-        # Stop button (disabled initially)
-        self.stop_btn = ttk.Button(main, text="⏹ Stop", command=self.stop_conversion, state="disabled")
+        # Kill button (disabled initially) - INSTANT KILL
+        self.stop_btn = ttk.Button(main, text="☠ Kill", command=self.kill_conversion, state="disabled")
         self.stop_btn.pack(anchor="e", pady=(0, 10))
         
         # Status
@@ -220,8 +222,9 @@ class SimpleConverter:
     def show_formats(self, ext):
         self.format_placeholder.pack_forget()
         
-        for btn in self.format_buttons:
-            btn.destroy()
+        # Clear old buttons and frames
+        for widget in self.format_frame.winfo_children():
+            widget.destroy()
         self.format_buttons.clear()
         
         available = FORMATS[ext]['to']
@@ -248,6 +251,10 @@ class SimpleConverter:
     def convert(self):
         if not self.selected_file or not self.target_format:
             return
+        
+        # Reset kill state
+        self.killed = False
+        self.stop_requested = False
             
         self.convert_btn.configure(state="disabled", text="Converting...")
         self.stop_btn.configure(state="normal")
@@ -258,19 +265,48 @@ class SimpleConverter:
         # Start progress animation
         self.animate_progress()
         
+        # Create daemon thread that can be killed
         self.conversion_thread = threading.Thread(target=self.do_convert)
+        self.conversion_thread.daemon = True  # Daemon so it dies with main
         self.conversion_thread.start()
         
-    def stop_conversion(self):
-        """Stop the conversion (best effort)"""
-        self.status.configure(text="Stopping...")
-        # Note: Can't truly stop a thread in Python, but we can mark it
-        # The conversion will finish but we'll ignore the result
+    def kill_conversion(self):
+        """Kill the conversion instantly"""
+        self.killed = True
         self.stop_requested = True
+        self.status.configure(text="Killed")
+        
+        # INSTANT KILL: Terminate the thread by force
+        if self.conversion_thread and self.conversion_thread.is_alive():
+            import ctypes
+            thread_id = self.conversion_thread.ident
+            if thread_id:
+                try:
+                    # Raise exception in the thread to kill it
+                    ctypes.pythonapi.PyThreadState_SetAsyncExc(
+                        ctypes.c_long(thread_id), ctypes.py_object(SystemExit)
+                    )
+                except:
+                    pass
+        
+        # INSTANT UI RESET - FORCE IT
+        self.conversion_thread = None
+        self.progress["value"] = 0
+        self.convert_btn.configure(state="disabled", text="Convert File")
         self.stop_btn.configure(state="disabled")
+        
+        # Cancel any pending after callbacks
+        for after_id in self.root.tk.call('after', 'info'):
+            try:
+                self.root.after_cancel(after_id)
+            except:
+                pass
         
     def animate_progress(self):
         """Animate progress bar during conversion - FAST"""
+        # Stop animation if killed or stopped
+        if self.killed or self.stop_requested:
+            return
         if self.convert_btn.cget("text") == "Converting...":
             current = self.progress["value"]
             if current < 90:
@@ -279,6 +315,10 @@ class SimpleConverter:
         
     def do_convert(self):
         try:
+            # Check if killed immediately
+            if self.killed:
+                return
+                
             input_path = self.selected_file['path']
             target = self.target_format
             ext = self.selected_file['ext']
@@ -302,14 +342,24 @@ class SimpleConverter:
                 
             if converter is None:
                 raise Exception(f"No converter for {ext}")
+            
+            # Check if killed before conversion
+            if self.killed:
+                return
                 
             success = converter.convert(input_path, output_path, target)
+            
+            # Check if killed after conversion
+            if self.killed:
+                return
             
             if success:
                 self.root.after(0, lambda: self.done(output_path))
             else:
                 self.root.after(0, lambda: self.failed("Conversion failed"))
         except Exception as e:
+            if self.killed:
+                return  # Ignore errors if killed
             error_msg = str(e)
             print(f"Error: {error_msg}")
             import traceback
@@ -317,9 +367,12 @@ class SimpleConverter:
             self.root.after(0, lambda msg=error_msg: self.failed(msg))
             
     def done(self, path):
+        # If killed, ignore the result completely
+        if self.killed:
+            return
         if self.stop_requested:
-            self.reset()
             self.stop_requested = False
+            self.reset()
             return
         self.progress["value"] = 100
         self.convert_btn.configure(state="normal", text="Convert File")
@@ -327,17 +380,25 @@ class SimpleConverter:
         name = Path(path).name
         self.status.configure(text=f"Saved: {name}")
         
+        # Auto-reset progress bar after 2 seconds
+        self.root.after(2000, lambda: self.progress.configure(value=0))
+        
         if messagebox.askyesno("Success!", f"Converted!\n\nSaved as: {name}\n\nOpen folder?"):
             self.open_output_folder()
         self.reset()
         
     def failed(self, error=""):
+        # If killed, ignore the error completely
+        if self.killed:
+            return
+        was_stopped = self.stop_requested
         self.stop_requested = False
         self.progress["value"] = 0
-        self.convert_btn.configure(state="normal", text="Convert File")
+        self.convert_btn.configure(state="disabled" if was_stopped else "normal", text="Convert File")
         self.stop_btn.configure(state="disabled")
-        self.status.configure(text="Failed")
-        messagebox.showerror("Error", f"Conversion failed.\n{error[:200]}")
+        self.status.configure(text="Stopped" if was_stopped else "Failed")
+        if not was_stopped:
+            messagebox.showerror("Error", f"Conversion failed.\n{error[:200]}")
         
     def reset(self):
         self.selected_file = None
@@ -350,15 +411,18 @@ class SimpleConverter:
         
         self.file_info.configure(text="No file selected", foreground="gray")
         
-        for btn in self.format_buttons:
-            btn.destroy()
+        # Clear all widgets from format frame to prevent expansion
+        for widget in self.format_frame.winfo_children():
+            widget.destroy()
         self.format_buttons.clear()
         
         self.format_placeholder.pack(pady=15)
-        self.convert_btn.configure(state="disabled")
+        self.convert_btn.configure(state="disabled", text="Convert File")
         self.stop_btn.configure(state="disabled")
         self.progress["value"] = 0
         self.status.configure(text="Ready", foreground="gray")
+        self.stop_requested = False
+        self.killed = False
         
     def open_output_folder(self):
         import subprocess
