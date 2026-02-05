@@ -37,8 +37,9 @@ class SimpleConverter:
     def __init__(self, root):
         self.root = root
         self.root.title("File Converter Pro")
-        self.root.geometry("500x520")
-        self.root.resizable(False, False)
+        self.root.geometry("500x530")
+        self.root.resizable(True, True)
+        self.root.minsize(450, 450)
         
         self.center_window()
         
@@ -57,8 +58,32 @@ class SimpleConverter:
         self.root.geometry(f'{w}x{h}+{x}+{y}')
         
     def create_ui(self):
-        main = ttk.Frame(self.root, padding="15")
-        main.pack(fill="both", expand=True)
+        # Create a canvas with scrollbar for scrolling
+        canvas = tk.Canvas(self.root, bg="#f0f0f0", highlightthickness=0)
+        scrollbar = ttk.Scrollbar(self.root, orient="vertical", command=canvas.yview)
+        
+        # Main frame inside canvas
+        main = ttk.Frame(canvas, padding="15")
+        
+        # Configure canvas
+        canvas.configure(yscrollcommand=scrollbar.set)
+        
+        # Pack scrollbar and canvas
+        scrollbar.pack(side="right", fill="y")
+        canvas.pack(side="left", fill="both", expand=True)
+        
+        # Create window inside canvas
+        canvas_window = canvas.create_window((0, 0), window=main, anchor="nw", width=500)
+        
+        # Update scroll region when frame changes size
+        def configure_canvas(event):
+            canvas.configure(scrollregion=canvas.bbox("all"))
+        main.bind("<Configure>", configure_canvas)
+        
+        # Also update when canvas changes size
+        def on_canvas_configure(event):
+            canvas.itemconfig(canvas_window, width=event.width)
+        canvas.bind("<Configure>", on_canvas_configure)
         
         # Header with title and credit
         header = ttk.Frame(main)
@@ -73,7 +98,7 @@ class SimpleConverter:
                                highlightthickness=0, bd=0)
         logo_canvas.pack(side="left", padx=(0, 10))
         logo_canvas.create_polygon(20, 5, 35, 20, 25, 20, 25, 35, 15, 35, 15, 20, 5, 20, 
-                                  fill="#4a90d9", outline="#4a90d9")
+                                  fill="#5ba3e8", outline="#5ba3e8")
         
         ttk.Label(header_left, text="File Converter Pro", font=("Segoe UI", 16, "bold")).pack(side="left")
         
@@ -107,8 +132,8 @@ class SimpleConverter:
         
         # Convert button - BLUE
         self.convert_btn = tk.Button(main, text="Convert File", command=self.convert, state="disabled",
-                                     bg="#4a90d9", fg="white", font=("Segoe UI", 10, "bold"),
-                                     activebackground="#357abd", activeforeground="white")
+                                     bg="#5ba3e8", fg="white", font=("Segoe UI", 10, "bold"),
+                                     activebackground="#4a92d0", activeforeground="white")
         self.convert_btn.pack(fill="x", pady=(0, 10))
         
         # Progress bar (hidden initially)
