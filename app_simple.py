@@ -41,14 +41,8 @@ class SimpleFileConverter:
     def __init__(self, root):
         self.root = root
         self.root.title("File Converter Pro")
-        self.root.geometry("500x480")
+        self.root.geometry("500x450")
         self.root.resizable(False, False)
-        
-        # Set window icon (favicon)
-        try:
-            self.root.iconbitmap(default='')
-        except:
-            pass
         
         # Center window
         self.center_window()
@@ -81,9 +75,9 @@ class SimpleFileConverter:
         header = ttk.Frame(main)
         header.pack(anchor="w", pady=(0, 20), fill="x")
         
-        # Simple logo using Canvas - no border
+        # Simple logo using Canvas
         logo_canvas = tk.Canvas(header, width=40, height=40, bg="#f0f0f0", 
-                               highlightthickness=0)
+                               highlightthickness=1, highlightbackground="#999")
         logo_canvas.pack(side="left", padx=(0, 10))
         # Draw a simple arrow icon
         logo_canvas.create_polygon(20, 5, 35, 20, 25, 20, 25, 35, 15, 35, 15, 20, 5, 20, 
@@ -133,11 +127,6 @@ class SimpleFileConverter:
         
         # Output folder button
         ttk.Button(main, text="Open Output Folder", command=self.open_output_folder).pack(fill="x")
-        
-        # Built by credit - subtle
-        credit = ttk.Label(main, text="Built by: Dequavious", 
-                          font=("Segoe UI", 8), foreground="#999")
-        credit.pack(side="bottom", anchor="e", pady=(10, 0))
         
     def browse_file(self):
         """Browse for file"""

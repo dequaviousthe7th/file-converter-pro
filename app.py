@@ -59,12 +59,6 @@ class FileConverterPro(ctk.CTk):
         self.minsize(800, 600)
         self.configure(fg_color=COLORS['bg'])
         
-        # Set window icon (favicon)
-        try:
-            self.iconbitmap(default='')
-        except:
-            pass
-        
         self.selected_file = None
         self.target_format = None
         self.output_dir = Path(__file__).parent / "converted"
@@ -92,14 +86,26 @@ class FileConverterPro(ctk.CTk):
         content = ctk.CTkFrame(main, fg_color=COLORS['bg'])
         content.pack(side="left", fill="both", expand=True, padx=25, pady=20)
         
-        # Header
-        ctk.CTkLabel(content, text="File Converter Pro", 
+        # Header with title and credit
+        header = ctk.CTkFrame(content, fg_color="transparent")
+        header.pack(fill="x", pady=(0, 20))
+        
+        # Title on left
+        title_frame = ctk.CTkFrame(header, fg_color="transparent")
+        title_frame.pack(side="left")
+        
+        ctk.CTkLabel(title_frame, text="File Converter Pro", 
                     font=ctk.CTkFont(size=26, weight="bold"),
                     text_color=COLORS['text']).pack(anchor="w")
         
-        ctk.CTkLabel(content, text="Convert between PDF, Word, Images & more",
+        ctk.CTkLabel(title_frame, text="Convert between PDF, Word, Images & more",
                     font=ctk.CTkFont(size=13),
-                    text_color=COLORS['text_secondary']).pack(anchor="w", pady=(5, 20))
+                    text_color=COLORS['text_secondary']).pack(anchor="w", pady=(5, 0))
+        
+        # Built by credit on right
+        ctk.CTkLabel(header, text="Built by: Dequavious", 
+                    font=ctk.CTkFont(size=11),
+                    text_color=COLORS['text_secondary']).pack(side="right", pady=(10, 0))
         
         # Main content frame
         self.main_frame = ctk.CTkFrame(content, fg_color="transparent")
@@ -108,59 +114,38 @@ class FileConverterPro(ctk.CTk):
         self.show_upload_screen()
         
     def create_sidebar(self, parent):
-        """Create left sidebar with properly centered icons"""
+        """Create left sidebar - just navigation, no logo"""
         sidebar = ctk.CTkFrame(parent, fg_color=COLORS['sidebar'], 
                               width=70, corner_radius=0)
         sidebar.pack(side="left", fill="y")
         sidebar.pack_propagate(False)
         
-        # Center container for all sidebar items
+        # Center container
         container = ctk.CTkFrame(sidebar, fg_color="transparent", width=70)
         container.pack(fill="y", expand=True)
         container.pack_propagate(False)
         
-        # Logo at top - centered
-        logo_frame = ctk.CTkFrame(container, fg_color="transparent", width=70, height=80)
-        logo_frame.pack(pady=(30, 0))
-        logo_frame.pack_propagate(False)
+        # Navigation icon only (no logo)
+        nav_frame = ctk.CTkFrame(container, fg_color="transparent", width=70, height=80)
+        nav_frame.pack(pady=(40, 0))
+        nav_frame.pack_propagate(False)
         
-        logo = ctk.CTkLabel(logo_frame, text="🔄", font=ctk.CTkFont(size=28),
-                           fg_color=COLORS['primary'], corner_radius=12,
-                           width=45, height=45)
-        logo.place(relx=0.5, rely=0.5, anchor="center")
+        btn = ctk.CTkButton(nav_frame, text="📁", font=ctk.CTkFont(size=22),
+                           width=45, height=45, corner_radius=10,
+                           fg_color=COLORS['primary'],
+                           hover_color=COLORS['card_hover'])
+        btn.place(relx=0.5, rely=0.5, anchor="center")
         
-        # Navigation icons - each centered in its own frame
-        nav_items = [
-            ("📁", "Convert", True),
-        ]
-        
-        for icon, label, active in nav_items:
-            # Container for each icon to ensure centering
-            item_frame = ctk.CTkFrame(container, fg_color="transparent", width=70, height=55)
-            item_frame.pack(pady=5)
-            item_frame.pack_propagate(False)
-            
-            btn = ctk.CTkButton(item_frame, text=icon, font=ctk.CTkFont(size=22),
-                               width=45, height=45, corner_radius=10,
-                               fg_color=COLORS['primary'] if active else "transparent",
-                               hover_color=COLORS['card_hover'])
-            btn.place(relx=0.5, rely=0.5, anchor="center")
-        
-        # Version at bottom - centered
+        # Version at bottom
         version_frame = ctk.CTkFrame(container, fg_color="transparent", width=70, height=40)
         version_frame.pack(side="bottom", pady=20)
         version_frame.pack_propagate(False)
         
         ctk.CTkLabel(version_frame, text="v1.0", font=ctk.CTkFont(size=10),
-                    text_color=COLORS['text_secondary']).place(relx=0.5, rely=0.3, anchor="center")
-        
-        # Built by credit
-        ctk.CTkLabel(version_frame, text="Built by:\nDequavious", 
-                    font=ctk.CTkFont(size=8),
-                    text_color=COLORS['text_secondary']).place(relx=0.5, rely=0.7, anchor="center")
+                    text_color=COLORS['text_secondary']).place(relx=0.5, rely=0.5, anchor="center")
         
     def show_upload_screen(self):
-        """Show initial upload screen"""
+        """Show initial upload screen with 🔄 icon"""
         for w in self.main_frame.winfo_children():
             w.destroy()
             
@@ -173,13 +158,13 @@ class FileConverterPro(ctk.CTk):
         content = ctk.CTkFrame(card, fg_color="transparent")
         content.place(relx=0.5, rely=0.5, anchor="center")
         
-        # Upload icon
+        # 🔄 Icon in a circle
         icon_bg = ctk.CTkFrame(content, fg_color=COLORS['card_hover'], 
-                              corner_radius=20, width=100, height=100)
+                              corner_radius=50, width=100, height=100)
         icon_bg.pack(pady=(0, 25))
         icon_bg.pack_propagate(False)
         
-        ctk.CTkLabel(icon_bg, text="☁️", font=ctk.CTkFont(size=48)).place(
+        ctk.CTkLabel(icon_bg, text="🔄", font=ctk.CTkFont(size=50)).place(
             relx=0.5, rely=0.5, anchor="center")
         
         # Title
@@ -280,15 +265,13 @@ class FileConverterPro(ctk.CTk):
                     font=ctk.CTkFont(size=16, weight="bold"),
                     text_color=COLORS['text']).pack(anchor="w", padx=20, pady=(20, 15))
         
-        # Format buttons - use frames with explicit layout
+        # Format buttons
         available = FORMATS[ext]['to']
         self.format_buttons = {}
         
-        # Container for buttons
         btn_container = ctk.CTkFrame(fmt_card, fg_color="transparent")
         btn_container.pack(fill="both", expand=True, padx=20, pady=(0, 15))
         
-        # Create rows of 3 buttons each
         for i in range(0, len(available), 3):
             row_frame = ctk.CTkFrame(btn_container, fg_color="transparent")
             row_frame.pack(fill="x", pady=5)
@@ -316,7 +299,6 @@ class FileConverterPro(ctk.CTk):
         """Handle format selection"""
         self.target_format = fmt
         
-        # Update button colors
         for f, btn in self.format_buttons.items():
             if f == fmt:
                 btn.configure(fg_color=COLORS['primary'])
@@ -345,7 +327,6 @@ class FileConverterPro(ctk.CTk):
             output_name = f"{Path(input_path).stem}_converted.{target}"
             output_path = str(self.output_dir / output_name)
             
-            # Get converter
             converter = None
             if ext == 'pdf':
                 converter = PDFConverter()
