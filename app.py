@@ -40,18 +40,28 @@ COLORS = {
     'error': '#EF4444',
 }
 
-# Format configuration with icons and colors
+# Format configuration with icons, colors and conversion options
 FORMAT_CONFIG = {
-    'pdf': {'name': 'PDF', 'icon': '📄', 'color': '#EF4444', 'desc': 'Portable Document'},
-    'docx': {'name': 'Word', 'icon': '📝', 'color': '#3B82F6', 'desc': 'Microsoft Word'},
-    'md': {'name': 'Markdown', 'icon': '📑', 'color': '#8B5CF6', 'desc': 'Markdown Doc'},
-    'txt': {'name': 'Text', 'icon': '📃', 'color': '#6B7280', 'desc': 'Plain Text'},
-    'png': {'name': 'PNG', 'icon': '🖼️', 'color': '#10B981', 'desc': 'PNG Image'},
-    'jpg': {'name': 'JPG', 'icon': '🖼️', 'color': '#F59E0B', 'desc': 'JPEG Image'},
-    'jpeg': {'name': 'JPEG', 'icon': '🖼️', 'color': '#F59E0B', 'desc': 'JPEG Image'},
-    'webp': {'name': 'WebP', 'icon': '🖼️', 'color': '#EC4899', 'desc': 'WebP Image'},
-    'bmp': {'name': 'BMP', 'icon': '🖼️', 'color': '#14B8A6', 'desc': 'BMP Image'},
-    'html': {'name': 'HTML', 'icon': '🌐', 'color': '#F97316', 'desc': 'HTML Page'}
+    'pdf': {'name': 'PDF', 'icon': '📄', 'color': '#EF4444', 'desc': 'Portable Document', 
+            'converts_to': ['docx', 'txt', 'md', 'png', 'jpg']},
+    'docx': {'name': 'Word', 'icon': '📝', 'color': '#3B82F6', 'desc': 'Microsoft Word',
+             'converts_to': ['pdf', 'txt', 'md']},
+    'md': {'name': 'Markdown', 'icon': '📑', 'color': '#8B5CF6', 'desc': 'Markdown Doc',
+           'converts_to': ['pdf', 'docx', 'txt', 'html']},
+    'txt': {'name': 'Text', 'icon': '📃', 'color': '#6B7280', 'desc': 'Plain Text',
+            'converts_to': ['pdf', 'docx', 'md']},
+    'png': {'name': 'PNG', 'icon': '🖼️', 'color': '#10B981', 'desc': 'PNG Image',
+            'converts_to': ['pdf', 'jpg', 'webp', 'bmp']},
+    'jpg': {'name': 'JPG', 'icon': '🖼️', 'color': '#F59E0B', 'desc': 'JPEG Image',
+            'converts_to': ['pdf', 'png', 'webp', 'bmp']},
+    'jpeg': {'name': 'JPEG', 'icon': '🖼️', 'color': '#F59E0B', 'desc': 'JPEG Image',
+             'converts_to': ['pdf', 'png', 'webp', 'bmp']},
+    'webp': {'name': 'WebP', 'icon': '🖼️', 'color': '#EC4899', 'desc': 'WebP Image',
+             'converts_to': ['pdf', 'png', 'jpg', 'bmp']},
+    'bmp': {'name': 'BMP', 'icon': '🖼️', 'color': '#14B8A6', 'desc': 'BMP Image',
+            'converts_to': ['pdf', 'png', 'jpg', 'webp']},
+    'html': {'name': 'HTML', 'icon': '🌐', 'color': '#F97316', 'desc': 'HTML Page',
+             'converts_to': ['pdf', 'md']}
 }
 
 # Set appearance
@@ -158,7 +168,7 @@ class FileConverterPro(ctk.CTk):
         )
         logo.place(relx=0.5, rely=0.5, anchor="center")
         
-        # Navigation items
+        # Navigation items - centered
         nav_items = [
             ("📁", "Convert", True),
             ("⚙️", "Settings", False),
@@ -169,8 +179,12 @@ class FileConverterPro(ctk.CTk):
         nav_frame.pack(fill="x", pady=(40, 0))
         
         for icon, label, active in nav_items:
+            btn_container = ctk.CTkFrame(nav_frame, fg_color="transparent", width=80, height=50)
+            btn_container.pack(pady=8)
+            btn_container.pack_propagate(False)
+            
             btn = ctk.CTkButton(
-                nav_frame,
+                btn_container,
                 text=icon,
                 font=ctk.CTkFont(size=24),
                 width=50,
@@ -180,7 +194,7 @@ class FileConverterPro(ctk.CTk):
                 hover_color=COLORS['surface_light'],
                 command=lambda l=label: self.nav_clicked(l)
             )
-            btn.pack(pady=8)
+            btn.place(relx=0.5, rely=0.5, anchor="center")
             
         # Version at bottom
         version = ctk.CTkLabel(
@@ -762,8 +776,22 @@ class FileConverterPro(ctk.CTk):
 
 
 def main():
-    app = FileConverterPro()
-    app.mainloop()
+    print("Starting File Converter Pro...")
+    try:
+        print("Creating app instance...")
+        app = FileConverterPro()
+        print("App created, starting main loop...")
+        app.mainloop()
+    except Exception as e:
+        import traceback
+        print("\n========================================")
+        print("ERROR STARTING APP:")
+        print("========================================")
+        print(str(e))
+        print("\nFull traceback:")
+        traceback.print_exc()
+        print("========================================")
+        input("\nPress Enter to exit...")
 
 
 if __name__ == "__main__":
