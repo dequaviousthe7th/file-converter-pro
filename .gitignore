@@ -38,10 +38,8 @@ venv.bak/
 .DS_Store
 Thumbs.db
 
-# Application
-uploads/*
+# Application output
 converted/*
-!uploads/.gitkeep
 !converted/.gitkeep
 
 # Logs
