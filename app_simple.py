@@ -37,7 +37,7 @@ class SimpleConverter:
     def __init__(self, root):
         self.root = root
         self.root.title("File Converter Pro")
-        self.root.geometry("500x420")
+        self.root.geometry("500x480")
         self.root.resizable(False, False)
         
         self.center_window()
@@ -110,6 +110,11 @@ class SimpleConverter:
                                      bg="#4a90d9", fg="white", font=("Segoe UI", 10, "bold"),
                                      activebackground="#357abd", activeforeground="white")
         self.convert_btn.pack(fill="x", pady=(0, 10))
+        
+        # Progress bar (hidden initially)
+        self.progress = ttk.Progressbar(main, mode="determinate", maximum=100)
+        self.progress.pack(fill="x", pady=(0, 10))
+        self.progress["value"] = 0
         
         # Status
         self.status = ttk.Label(main, text="Ready", foreground="gray")
@@ -184,10 +189,22 @@ class SimpleConverter:
             
         self.convert_btn.configure(state="disabled", text="Converting...")
         self.status.configure(text="Converting...")
+        self.progress["value"] = 0
         self.root.update()
+        
+        # Start progress animation
+        self.animate_progress()
         
         thread = threading.Thread(target=self.do_convert)
         thread.start()
+        
+    def animate_progress(self):
+        """Animate progress bar during conversion"""
+        if self.convert_btn.cget("text") == "Converting...":
+            current = self.progress["value"]
+            if current < 90:
+                self.progress["value"] = current + 2
+                self.root.after(100, self.animate_progress)
         
     def do_convert(self):
         try:
@@ -229,6 +246,7 @@ class SimpleConverter:
             self.root.after(0, lambda msg=error_msg: self.failed(msg))
             
     def done(self, path):
+        self.progress["value"] = 100
         self.convert_btn.configure(state="normal", text="Convert File")
         name = Path(path).name
         self.status.configure(text=f"Saved: {name}")
@@ -238,6 +256,7 @@ class SimpleConverter:
         self.reset()
         
     def failed(self, error=""):
+        self.progress["value"] = 0
         self.convert_btn.configure(state="normal", text="Convert File")
         self.status.configure(text="Failed")
         messagebox.showerror("Error", f"Conversion failed.\n{error[:200]}")
@@ -259,6 +278,7 @@ class SimpleConverter:
         
         self.format_placeholder.pack(pady=15)
         self.convert_btn.configure(state="disabled")
+        self.progress["value"] = 0
         self.status.configure(text="Ready", foreground="gray")
         
     def open_output_folder(self):

@@ -20,17 +20,17 @@ from backend.converters.markdown_converter import MarkdownConverter
 from backend.converters.image_converter import ImageConverter
 from backend.converters.text_converter import TextConverter
 
-# Colors: WHITE, LIGHT GRAY, BLACK, BLUE ONLY
+# Colors: WHITE background theme
 COLORS = {
-    'bg': '#1a1a2e',       # Dark background (almost black)
-    'sidebar': '#16213e',  # Slightly lighter
-    'card': '#0f3460',     # Card background
-    'card_hover': '#1a4a7a',
-    'primary': '#4a90d9',  # BLUE only
+    'bg': '#ffffff',       # WHITE background
+    'sidebar': '#4a90d9',  # BLUE sidebar only
+    'card': '#f9fafb',     # Light card background
+    'card_hover': '#e5e7eb',
+    'primary': '#4a90d9',  # BLUE
     'primary_hover': '#357abd',
-    'text': '#f8fafc',     # White
-    'text_secondary': '#94a3b8',  # Light gray
-    'border': '#334155',
+    'text': '#111827',     # Dark text
+    'text_secondary': '#6b7280',  # Gray text
+    'border': '#d1d5db',
 }
 
 FORMATS = {
@@ -46,7 +46,7 @@ FORMATS = {
     'html': {'name': 'HTML', 'icon': '🌐', 'to': ['pdf', 'md']}
 }
 
-ctk.set_appearance_mode("dark")
+ctk.set_appearance_mode("light")
 
 
 class FileConverterPro(ctk.CTk):
