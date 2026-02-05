@@ -169,4 +169,6 @@ MIT License - see LICENSE file for details.
 
 ---
 
-Made with ❤️ by Dequavious | Version 1.1.0
+<p align="center">
+  <b>Built by Dequavious | Version 1.1.0</b>
+</p>
