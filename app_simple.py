@@ -37,9 +37,9 @@ class SimpleConverter:
     def __init__(self, root):
         self.root = root
         self.root.title("File Converter Pro")
-        self.root.geometry("500x530")
+        self.root.geometry("140x610")
         self.root.resizable(True, True)
-        self.root.minsize(450, 450)
+        self.root.minsize(120, 510)
         
         self.center_window()
         
@@ -70,12 +70,29 @@ class SimpleConverter:
         # Configure canvas
         canvas.configure(yscrollcommand=scrollbar.set)
         
-        # Pack scrollbar and canvas
+        # Pack scrollbar hidden initially (only show when needed)
         scrollbar.pack(side="right", fill="y")
+        scrollbar.pack_forget()  # Hide initially
         canvas.pack(side="left", fill="both", expand=True)
         
-        # Create window inside canvas
-        canvas_window = canvas.create_window((0, 0), window=main, anchor="nw", width=500)
+        # Function to show/hide scrollbar based on content
+        def update_scrollbar(event=None):
+            canvas.update_idletasks()
+            bbox = canvas.bbox("all")
+            if bbox:
+                content_height = bbox[3] - bbox[1]
+                canvas_height = canvas.winfo_height()
+                if content_height > canvas_height:
+                    scrollbar.pack(side="right", fill="y")
+                else:
+                    scrollbar.pack_forget()
+        
+        # Update scrollbar on configure
+        canvas.bind("<Configure>", lambda e: (on_canvas_configure(e), update_scrollbar(e)))
+        main.bind("<Configure>", lambda e: (configure_canvas(e), update_scrollbar(e)))
+        
+        # Create window inside canvas - WIDTH MUST MATCH ROOT
+        canvas_window = canvas.create_window((0, 0), window=main, anchor="nw", width=140)
         
         # Update scroll region when frame changes size
         def configure_canvas(event):
@@ -91,21 +108,37 @@ class SimpleConverter:
         header = ttk.Frame(main)
         header.pack(fill="x", pady=(0, 15))
         
-        # Logo (NO BORDER) and Title
+        # Logo, Title and Credit - stacked
         header_left = ttk.Frame(header)
         header_left.pack(side="left")
         
+        # Logo and Title row
+        logo_title_row = ttk.Frame(header_left)
+        logo_title_row.pack(anchor="w")
+        
         # Canvas with NO border (highlightthickness=0)
-        logo_canvas = tk.Canvas(header_left, width=40, height=40, bg="#f0f0f0", 
+        logo_canvas = tk.Canvas(logo_title_row, width=40, height=40, bg="#f0f0f0", 
                                highlightthickness=0, bd=0)
         logo_canvas.pack(side="left", padx=(0, 10))
         logo_canvas.create_polygon(20, 5, 35, 20, 25, 20, 25, 35, 15, 35, 15, 20, 5, 20, 
                                   fill="#5ba3e8", outline="#5ba3e8")
         
-        ttk.Label(header_left, text="File Converter Pro", font=("Segoe UI", 16, "bold")).pack(side="left")
+        # Right side of header - Version at top right
+        header_right = ttk.Frame(header)
+        header_right.pack(side="right")
         
-        # Built by credit
-        ttk.Label(header, text="Built by: Dequavious", font=("Segoe UI", 9), foreground="gray").pack(side="right")
+        # Version at top right - CODE LOCATION: Line ~131
+        # ADJUST pady=(TOP, BOTTOM) to move up/down
+        ttk.Label(header_right, text="Version: 1.1.0", font=("Segoe UI", 8), foreground="gray").pack(anchor="ne", pady=(32, 0))
+        
+        title_frame = ttk.Frame(logo_title_row)
+        title_frame.pack(side="left")
+        
+        ttk.Label(title_frame, text="File Converter Pro", font=("Segoe UI", 16, "bold")).pack(anchor="w")
+        
+        # Built by credit - UNDER the title - CODE LOCATION: Line ~141
+        # This is below "File Converter Pro" title
+        ttk.Label(title_frame, text="Built by: Dequavious", font=("Segoe UI", 8), foreground="gray").pack(anchor="w")
         
         # File selection
         file_frame = ttk.LabelFrame(main, text="Select File", padding="10")
@@ -237,12 +270,12 @@ class SimpleConverter:
         self.stop_btn.configure(state="disabled")
         
     def animate_progress(self):
-        """Animate progress bar during conversion"""
+        """Animate progress bar during conversion - FAST"""
         if self.convert_btn.cget("text") == "Converting...":
             current = self.progress["value"]
             if current < 90:
-                self.progress["value"] = current + 2
-                self.root.after(100, self.animate_progress)
+                self.progress["value"] = current + 5  # Bigger steps
+                self.root.after(50, self.animate_progress)  # Faster updates
         
     def do_convert(self):
         try:
