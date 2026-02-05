@@ -59,6 +59,12 @@ class FileConverterPro(ctk.CTk):
         self.minsize(800, 600)
         self.configure(fg_color=COLORS['bg'])
         
+        # Set window icon (favicon)
+        try:
+            self.iconbitmap(default='')
+        except:
+            pass
+        
         self.selected_file = None
         self.target_format = None
         self.output_dir = Path(__file__).parent / "converted"
@@ -126,8 +132,6 @@ class FileConverterPro(ctk.CTk):
         # Navigation icons - each centered in its own frame
         nav_items = [
             ("📁", "Convert", True),
-            ("⚙️", "Settings", False),
-            ("❓", "Help", False),
         ]
         
         for icon, label, active in nav_items:
@@ -148,7 +152,12 @@ class FileConverterPro(ctk.CTk):
         version_frame.pack_propagate(False)
         
         ctk.CTkLabel(version_frame, text="v1.0", font=ctk.CTkFont(size=10),
-                    text_color=COLORS['text_secondary']).place(relx=0.5, rely=0.5, anchor="center")
+                    text_color=COLORS['text_secondary']).place(relx=0.5, rely=0.3, anchor="center")
+        
+        # Built by credit
+        ctk.CTkLabel(version_frame, text="Built by:\nDequavious", 
+                    font=ctk.CTkFont(size=8),
+                    text_color=COLORS['text_secondary']).place(relx=0.5, rely=0.7, anchor="center")
         
     def show_upload_screen(self):
         """Show initial upload screen"""
