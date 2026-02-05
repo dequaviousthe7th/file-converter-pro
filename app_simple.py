@@ -61,10 +61,6 @@ class SimpleConverter:
         self.root.geometry(f'{w}x{h}+{x}+{y}')
         
     def create_ui(self):
-        # Remove focus highlight from all ttk widgets
-        style = ttk.Style()
-        style.configure('TRadiobutton', focusthickness=0, focuscolor=style.lookup('TRadiobutton', 'background'))
-        
         # Create a canvas with scrollbar for scrolling
         canvas = tk.Canvas(self.root, bg="#f0f0f0", highlightthickness=0)
         scrollbar = ttk.Scrollbar(self.root, orient="vertical", command=canvas.yview)
@@ -427,6 +423,10 @@ class SimpleConverter:
         self.status.configure(text="Ready", foreground="gray")
         self.stop_requested = False
         self.killed = False
+        
+        # Remove focus highlight from Convert To box
+        self.format_frame.focus_set()
+        self.root.focus_set()
         
     def open_output_folder(self):
         import subprocess
