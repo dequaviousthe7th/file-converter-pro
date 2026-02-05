@@ -87,46 +87,57 @@ class SimpleFileConverter:
         title = ttk.Label(header, text="File Converter Pro", font=("Segoe UI", 18, "bold"))
         title.pack(side="left")
         
-        # File selection
-        file_frame = ttk.LabelFrame(main, text="Select File", padding="10")
-        file_frame.pack(fill="x", pady=(0, 10))
+        # File selection - more visible frame
+        file_frame = tk.LabelFrame(main, text=" Select File ", font=("Segoe UI", 10, "bold"),
+                                   bg="#f5f5f5", fg="#333", bd=2, relief="groove", padx=10, pady=10)
+        file_frame.pack(fill="x", pady=(0, 15))
         
-        file_row = ttk.Frame(file_frame)
+        file_row = tk.Frame(file_frame, bg="#f5f5f5")
         file_row.pack(fill="x")
         
-        self.file_entry = ttk.Entry(file_row, state="readonly")
-        self.file_entry.pack(side="left", fill="x", expand=True, padx=(0, 5))
+        self.file_entry = tk.Entry(file_row, state="readonly", font=("Segoe UI", 10),
+                                   bg="white", fg="#333", relief="solid", bd=1)
+        self.file_entry.pack(side="left", fill="x", expand=True, padx=(0, 5), ipady=3)
         
-        ttk.Button(file_row, text="Browse...", command=self.browse_file, width=10).pack(side="right")
+        tk.Button(file_row, text="Browse...", command=self.browse_file, width=10,
+                  font=("Segoe UI", 9), bg="#e0e0e0", relief="raised", bd=2).pack(side="right")
         
         # File info
-        self.file_info = ttk.Label(file_frame, text="No file selected", foreground="gray")
-        self.file_info.pack(anchor="w", pady=(5, 0))
+        self.file_info = tk.Label(file_frame, text="No file selected", 
+                                   bg="#f5f5f5", fg="#666", font=("Segoe UI", 9))
+        self.file_info.pack(anchor="w", pady=(8, 0))
         
-        # Format selection
-        self.format_frame = ttk.LabelFrame(main, text="Convert To", padding="10")
-        self.format_frame.pack(fill="x", pady=(0, 10))
+        # Format selection - more visible frame
+        self.format_frame = tk.LabelFrame(main, text=" Convert To ", font=("Segoe UI", 10, "bold"),
+                                          bg="#f5f5f5", fg="#333", bd=2, relief="groove", padx=10, pady=10)
+        self.format_frame.pack(fill="x", pady=(0, 15))
         
         self.format_var = tk.StringVar()
         self.format_buttons = []
         
         # Placeholder label (will be replaced when file selected)
-        self.format_placeholder = ttk.Label(self.format_frame, text="Select a file first", foreground="gray")
+        self.format_placeholder = tk.Label(self.format_frame, text="Select a file first", 
+                                          bg="#f5f5f5", fg="#888", font=("Segoe UI", 10))
         self.format_placeholder.pack(pady=20)
         
-        # Convert button
-        self.convert_btn = ttk.Button(main, text="Convert File", command=self.convert, state="disabled")
-        self.convert_btn.pack(fill="x", pady=(0, 10))
+        # Convert button - more visible
+        self.convert_btn = tk.Button(main, text="Convert File", command=self.convert, state="disabled",
+                                     font=("Segoe UI", 11, "bold"), bg="#4a90d9", fg="white",
+                                     activebackground="#357abd", activeforeground="white",
+                                     relief="raised", bd=3, padx=10, pady=8)
+        self.convert_btn.pack(fill="x", pady=(5, 10))
         
         # Status
-        self.status = ttk.Label(main, text="Ready", foreground="gray")
-        self.status.pack(anchor="w")
+        self.status = tk.Label(main, text="Ready", fg="#666", bg="#f0f0f0", 
+                              font=("Segoe UI", 9), anchor="w")
+        self.status.pack(fill="x", pady=(0, 10))
         
         # Separator
-        ttk.Separator(main, orient="horizontal").pack(fill="x", pady=15)
+        tk.Frame(main, bg="#ccc", height=2).pack(fill="x", pady=10)
         
         # Output folder button
-        ttk.Button(main, text="Open Output Folder", command=self.open_output_folder).pack(fill="x")
+        tk.Button(main, text="Open Output Folder", command=self.open_output_folder,
+                 font=("Segoe UI", 9), bg="#e0e0e0", relief="raised", bd=2, padx=5, pady=5).pack(fill="x")
         
     def browse_file(self):
         """Browse for file"""
@@ -194,21 +205,23 @@ class SimpleFileConverter:
         available = FORMATS[ext]['to']
         
         # Create radio buttons in a grid
-        frame = ttk.Frame(self.format_frame)
-        frame.pack(fill="x")
+        frame = tk.Frame(self.format_frame, bg="#f5f5f5")
+        frame.pack(fill="x", pady=5)
         
         row, col = 0, 0
         for fmt in available:
             fmt_name = FORMATS.get(fmt, {}).get('name', fmt.upper())
             
-            rb = ttk.Radiobutton(
+            rb = tk.Radiobutton(
                 frame,
                 text=fmt_name,
                 variable=self.format_var,
                 value=fmt,
-                command=self.on_format_selected
+                command=self.on_format_selected,
+                bg="#f5f5f5", fg="#333", font=("Segoe UI", 10),
+                selectcolor="#4a90d9", activebackground="#e0e0e0"
             )
-            rb.grid(row=row, column=col, sticky="w", padx=10, pady=5)
+            rb.grid(row=row, column=col, sticky="w", padx=15, pady=8)
             self.format_buttons.append(rb)
             
             col += 1
