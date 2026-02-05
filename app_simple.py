@@ -61,6 +61,10 @@ class SimpleConverter:
         self.root.geometry(f'{w}x{h}+{x}+{y}')
         
     def create_ui(self):
+        # Remove focus highlight from all ttk widgets
+        style = ttk.Style()
+        style.configure('TRadiobutton', focusthickness=0, focuscolor=style.lookup('TRadiobutton', 'background'))
+        
         # Create a canvas with scrollbar for scrolling
         canvas = tk.Canvas(self.root, bg="#f0f0f0", highlightthickness=0)
         scrollbar = ttk.Scrollbar(self.root, orient="vertical", command=canvas.yview)
@@ -229,14 +233,14 @@ class SimpleConverter:
         
         available = FORMATS[ext]['to']
         frame = ttk.Frame(self.format_frame)
-        frame.pack(fill="x")
+        frame.pack(fill="x", pady=(2, 0))  # Reduced top padding to raise content more
         
         row, col = 0, 0
         for fmt in available:
             name = FORMATS.get(fmt, {}).get('name', fmt.upper())
             rb = ttk.Radiobutton(frame, text=name, variable=self.format_var, value=fmt,
-                                command=self.on_format_selected)
-            rb.grid(row=row, column=col, sticky="w", padx=10, pady=5)
+                                command=self.on_format_selected, takefocus=False)
+            rb.grid(row=row, column=col, sticky="w", padx=10, pady=2)  # Reduced pady
             self.format_buttons.append(rb)
             col += 1
             if col > 2:
@@ -375,7 +379,7 @@ class SimpleConverter:
             self.reset()
             return
         self.progress["value"] = 100
-        self.convert_btn.configure(state="normal", text="Convert File")
+        self.convert_btn.configure(text="Convert File")  # Reset text but keep disabled
         self.stop_btn.configure(state="disabled")
         name = Path(path).name
         self.status.configure(text=f"Saved: {name}")
