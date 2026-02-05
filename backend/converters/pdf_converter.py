@@ -10,7 +10,8 @@ from typing import Optional
 try:
     from pdf2docx import Converter as PDF2DocxConverter
     PDF2DOCX_AVAILABLE = True
-except ImportError:
+except ImportError as e:
+    print(f"pdf2docx import error: {e}")
     PDF2DOCX_AVAILABLE = False
 
 try:
