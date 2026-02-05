@@ -37,7 +37,7 @@ class SimpleConverter:
     def __init__(self, root):
         self.root = root
         self.root.title("File Converter Pro")
-        self.root.geometry("500x480")
+        self.root.geometry("500x520")
         self.root.resizable(False, False)
         
         self.center_window()

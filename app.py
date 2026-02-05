@@ -23,7 +23,7 @@ from backend.converters.text_converter import TextConverter
 # Colors: WHITE background theme
 COLORS = {
     'bg': '#ffffff',       # WHITE background
-    'sidebar': '#4a90d9',  # BLUE sidebar only
+    'sidebar': '#4a90d9',  # BLUE sidebar - same as browse button
     'card': '#f9fafb',     # Light card background
     'card_hover': '#e5e7eb',
     'primary': '#4a90d9',  # BLUE
@@ -129,10 +129,14 @@ class FileConverterPro(ctk.CTk):
         nav_frame.pack(pady=(10, 0))
         nav_frame.pack_propagate(False)
         
+        # White button with curved border on blue sidebar
         btn = ctk.CTkButton(nav_frame, text="📁", font=ctk.CTkFont(size=22),
-                           width=45, height=45, corner_radius=10,
-                           fg_color=COLORS['primary'],
-                           hover_color=COLORS['primary_hover'])
+                           width=50, height=50, corner_radius=12,
+                           fg_color="white",
+                           hover_color="#e5e7eb",
+                           text_color="#4a90d9",
+                           border_width=2,
+                           border_color="white")
         btn.place(relx=0.5, rely=0.5, anchor="center")
         
         # Version at bottom
@@ -141,7 +145,7 @@ class FileConverterPro(ctk.CTk):
         version_frame.pack_propagate(False)
         
         ctk.CTkLabel(version_frame, text="v1.0", font=ctk.CTkFont(size=10),
-                    text_color=COLORS['text_secondary']).place(relx=0.5, rely=0.5, anchor="center")
+                    text_color="white").place(relx=0.5, rely=0.5, anchor="center")
         
     def show_upload_screen(self):
         """Upload screen with 🔄 icon (not cloud)"""
