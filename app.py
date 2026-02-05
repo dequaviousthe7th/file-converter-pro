@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-File Converter Pro - Professional Desktop Application
-Modern, sleek UI with professional design
+File Converter Pro - Advanced Modern UI
+Dark theme with sidebar
 """
 
 import os
@@ -11,11 +11,8 @@ import tkinter as tk
 from tkinter import filedialog, messagebox
 from pathlib import Path
 import customtkinter as ctk
-from PIL import Image, ImageDraw
 
-# Add backend to path
-BASE_DIR = Path(__file__).parent
-sys.path.insert(0, str(BASE_DIR))
+sys.path.insert(0, str(Path(__file__).parent))
 
 from backend.converters.pdf_converter import PDFConverter
 from backend.converters.word_converter import WordConverter
@@ -23,597 +20,185 @@ from backend.converters.markdown_converter import MarkdownConverter
 from backend.converters.image_converter import ImageConverter
 from backend.converters.text_converter import TextConverter
 
-# Modern Color Palette
+# Colors
 COLORS = {
-    'primary': '#6366F1',      # Indigo
-    'primary_dark': '#4F46E5', # Darker Indigo
-    'primary_light': '#818CF8', # Light Indigo
-    'secondary': '#10B981',    # Emerald
-    'accent': '#F59E0B',       # Amber
-    'background': '#0F172A',   # Dark Slate
-    'surface': '#1E293B',      # Slate 800
-    'surface_light': '#334155', # Slate 700
-    'text': '#F8FAFC',         # White
-    'text_secondary': '#94A3B8', # Slate 400
-    'border': '#475569',       # Slate 600
-    'success': '#22C55E',
-    'error': '#EF4444',
+    'bg': '#0f172a',
+    'sidebar': '#1e293b',
+    'card': '#1e293b',
+    'card_hover': '#334155',
+    'primary': '#6366f1',
+    'primary_hover': '#4f46e5',
+    'text': '#f8fafc',
+    'text_secondary': '#94a3b8',
+    'border': '#334155',
 }
 
-# Format configuration with icons, colors and conversion options
-FORMAT_CONFIG = {
-    'pdf': {'name': 'PDF', 'icon': '📄', 'color': '#EF4444', 'desc': 'Portable Document', 
-            'converts_to': ['docx', 'txt', 'md', 'png', 'jpg']},
-    'docx': {'name': 'Word', 'icon': '📝', 'color': '#3B82F6', 'desc': 'Microsoft Word',
-             'converts_to': ['pdf', 'txt', 'md']},
-    'md': {'name': 'Markdown', 'icon': '📑', 'color': '#8B5CF6', 'desc': 'Markdown Doc',
-           'converts_to': ['pdf', 'docx', 'txt', 'html']},
-    'txt': {'name': 'Text', 'icon': '📃', 'color': '#6B7280', 'desc': 'Plain Text',
-            'converts_to': ['pdf', 'docx', 'md']},
-    'png': {'name': 'PNG', 'icon': '🖼️', 'color': '#10B981', 'desc': 'PNG Image',
-            'converts_to': ['pdf', 'jpg', 'webp', 'bmp']},
-    'jpg': {'name': 'JPG', 'icon': '🖼️', 'color': '#F59E0B', 'desc': 'JPEG Image',
-            'converts_to': ['pdf', 'png', 'webp', 'bmp']},
-    'jpeg': {'name': 'JPEG', 'icon': '🖼️', 'color': '#F59E0B', 'desc': 'JPEG Image',
-             'converts_to': ['pdf', 'png', 'webp', 'bmp']},
-    'webp': {'name': 'WebP', 'icon': '🖼️', 'color': '#EC4899', 'desc': 'WebP Image',
-             'converts_to': ['pdf', 'png', 'jpg', 'bmp']},
-    'bmp': {'name': 'BMP', 'icon': '🖼️', 'color': '#14B8A6', 'desc': 'BMP Image',
-            'converts_to': ['pdf', 'png', 'jpg', 'webp']},
-    'html': {'name': 'HTML', 'icon': '🌐', 'color': '#F97316', 'desc': 'HTML Page',
-             'converts_to': ['pdf', 'md']}
+# Format config
+FORMATS = {
+    'pdf': {'name': 'PDF', 'icon': '📄', 'to': ['docx', 'txt', 'md', 'png', 'jpg']},
+    'docx': {'name': 'Word', 'icon': '📝', 'to': ['pdf', 'txt', 'md']},
+    'md': {'name': 'Markdown', 'icon': '📑', 'to': ['pdf', 'docx', 'txt', 'html']},
+    'txt': {'name': 'Text', 'icon': '📃', 'to': ['pdf', 'docx', 'md']},
+    'png': {'name': 'PNG', 'icon': '🖼️', 'to': ['pdf', 'jpg', 'webp', 'bmp']},
+    'jpg': {'name': 'JPG', 'icon': '🖼️', 'to': ['pdf', 'png', 'webp', 'bmp']},
+    'jpeg': {'name': 'JPEG', 'icon': '🖼️', 'to': ['pdf', 'png', 'webp', 'bmp']},
+    'webp': {'name': 'WebP', 'icon': '🖼️', 'to': ['pdf', 'png', 'jpg', 'bmp']},
+    'bmp': {'name': 'BMP', 'icon': '🖼️', 'to': ['pdf', 'png', 'jpg', 'webp']},
+    'html': {'name': 'HTML', 'icon': '🌐', 'to': ['pdf', 'md']}
 }
 
-# Set appearance
 ctk.set_appearance_mode("dark")
-ctk.set_default_color_theme("dark-blue")
-
-
-class ModernButton(ctk.CTkButton):
-    """Custom modern button with hover effects"""
-    def __init__(self, master, **kwargs):
-        super().__init__(master, **kwargs)
-        self.configure(
-            font=ctk.CTkFont(family="Segoe UI", size=13, weight="bold"),
-            corner_radius=12,
-            border_width=0,
-            hover=True,
-        )
 
 
 class FileConverterPro(ctk.CTk):
     def __init__(self):
         super().__init__()
         
-        # Window setup
         self.title("File Converter Pro")
-        self.geometry("1000x800")
-        self.minsize(900, 700)
-        self.configure(fg_color=COLORS['background'])
+        self.geometry("900x700")
+        self.minsize(800, 600)
+        self.configure(fg_color=COLORS['bg'])
         
-        # Center window
-        self.center_window()
-        
-        # State
         self.selected_file = None
         self.target_format = None
-        self.is_converting = False
-        
-        # Output directory
-        self.output_dir = BASE_DIR / "converted"
+        self.output_dir = Path(__file__).parent / "converted"
         self.output_dir.mkdir(exist_ok=True)
         
-        # Build UI
+        self.center_window()
         self.create_ui()
         
     def center_window(self):
-        """Center window on screen"""
         self.update_idletasks()
-        width = 1000
-        height = 800
-        x = (self.winfo_screenwidth() // 2) - (width // 2)
-        y = (self.winfo_screenheight() // 2) - (height // 2)
-        self.geometry(f'{width}x{height}+{x}+{y}')
+        w, h = 900, 700
+        x = (self.winfo_screenwidth() // 2) - (w // 2)
+        y = (self.winfo_screenheight() // 2) - (h // 2)
+        self.geometry(f'{w}x{h}+{x}+{y}')
         
     def create_ui(self):
-        """Create the main user interface"""
         # Main container
-        self.main_container = ctk.CTkFrame(self, fg_color=COLORS['background'])
-        self.main_container.pack(fill="both", expand=True, padx=0, pady=0)
+        main = ctk.CTkFrame(self, fg_color=COLORS['bg'])
+        main.pack(fill="both", expand=True, padx=0, pady=0)
         
-        # Create sidebar
-        self.create_sidebar()
+        # Sidebar
+        self.create_sidebar(main)
         
-        # Create main content area
-        self.content_frame = ctk.CTkFrame(
-            self.main_container, 
-            fg_color=COLORS['background'],
-            corner_radius=0
-        )
-        self.content_frame.pack(side="left", fill="both", expand=True, padx=30, pady=20)
+        # Content area
+        content = ctk.CTkFrame(main, fg_color=COLORS['bg'])
+        content.pack(side="left", fill="both", expand=True, padx=25, pady=20)
         
         # Header
-        self.create_header()
+        ctk.CTkLabel(content, text="File Converter Pro", 
+                    font=ctk.CTkFont(size=26, weight="bold"),
+                    text_color=COLORS['text']).pack(anchor="w")
         
-        # Main area - changes based on state
-        self.main_area = ctk.CTkFrame(self.content_frame, fg_color="transparent")
-        self.main_area.pack(fill="both", expand=True, pady=(20, 0))
+        ctk.CTkLabel(content, text="Convert between PDF, Word, Images & more",
+                    font=ctk.CTkFont(size=13),
+                    text_color=COLORS['text_secondary']).pack(anchor="w", pady=(5, 20))
         
-        # Show initial upload screen
+        # Main content frame
+        self.main_frame = ctk.CTkFrame(content, fg_color="transparent")
+        self.main_frame.pack(fill="both", expand=True)
+        
         self.show_upload_screen()
         
-    def create_sidebar(self):
-        """Create left sidebar with branding"""
-        sidebar = ctk.CTkFrame(
-            self.main_container,
-            fg_color=COLORS['surface'],
-            width=80,
-            corner_radius=0
-        )
-        sidebar.pack(side="left", fill="y", padx=0, pady=0)
+    def create_sidebar(self, parent):
+        """Create left sidebar with properly centered icons"""
+        sidebar = ctk.CTkFrame(parent, fg_color=COLORS['sidebar'], 
+                              width=70, corner_radius=0)
+        sidebar.pack(side="left", fill="y")
         sidebar.pack_propagate(False)
         
-        # Logo at top
-        logo_frame = ctk.CTkFrame(sidebar, fg_color="transparent", height=100)
-        logo_frame.pack(fill="x", pady=(30, 0))
+        # Center container for all sidebar items
+        container = ctk.CTkFrame(sidebar, fg_color="transparent", width=70)
+        container.pack(fill="y", expand=True)
+        container.pack_propagate(False)
         
-        logo = ctk.CTkLabel(
-            logo_frame,
-            text="🔄",
-            font=ctk.CTkFont(size=36),
-            fg_color=COLORS['primary'],
-            corner_radius=15,
-            width=50,
-            height=50
-        )
+        # Logo at top - centered
+        logo_frame = ctk.CTkFrame(container, fg_color="transparent", width=70, height=80)
+        logo_frame.pack(pady=(30, 0))
+        logo_frame.pack_propagate(False)
+        
+        logo = ctk.CTkLabel(logo_frame, text="🔄", font=ctk.CTkFont(size=28),
+                           fg_color=COLORS['primary'], corner_radius=12,
+                           width=45, height=45)
         logo.place(relx=0.5, rely=0.5, anchor="center")
         
-        # Navigation items - centered
+        # Navigation icons - each centered in its own frame
         nav_items = [
             ("📁", "Convert", True),
             ("⚙️", "Settings", False),
             ("❓", "Help", False),
         ]
         
-        nav_frame = ctk.CTkFrame(sidebar, fg_color="transparent")
-        nav_frame.pack(fill="x", pady=(40, 0))
-        
         for icon, label, active in nav_items:
-            btn_container = ctk.CTkFrame(nav_frame, fg_color="transparent", width=80, height=50)
-            btn_container.pack(pady=8)
-            btn_container.pack_propagate(False)
+            # Container for each icon to ensure centering
+            item_frame = ctk.CTkFrame(container, fg_color="transparent", width=70, height=55)
+            item_frame.pack(pady=5)
+            item_frame.pack_propagate(False)
             
-            btn = ctk.CTkButton(
-                btn_container,
-                text=icon,
-                font=ctk.CTkFont(size=24),
-                width=50,
-                height=50,
-                corner_radius=12,
-                fg_color=COLORS['primary'] if active else "transparent",
-                hover_color=COLORS['surface_light'],
-                command=lambda l=label: self.nav_clicked(l)
-            )
+            btn = ctk.CTkButton(item_frame, text=icon, font=ctk.CTkFont(size=22),
+                               width=45, height=45, corner_radius=10,
+                               fg_color=COLORS['primary'] if active else "transparent",
+                               hover_color=COLORS['card_hover'])
             btn.place(relx=0.5, rely=0.5, anchor="center")
-            
-        # Version at bottom
-        version = ctk.CTkLabel(
-            sidebar,
-            text="v1.0",
-            font=ctk.CTkFont(size=11),
-            text_color=COLORS['text_secondary']
-        )
-        version.pack(side="bottom", pady=20)
         
-    def create_header(self):
-        """Create header with title"""
-        header = ctk.CTkFrame(self.content_frame, fg_color="transparent")
-        header.pack(fill="x", pady=(0, 10))
+        # Version at bottom - centered
+        version_frame = ctk.CTkFrame(container, fg_color="transparent", width=70, height=40)
+        version_frame.pack(side="bottom", pady=20)
+        version_frame.pack_propagate(False)
         
-        # Title
-        title = ctk.CTkLabel(
-            header,
-            text="File Converter Pro",
-            font=ctk.CTkFont(family="Segoe UI", size=32, weight="bold"),
-            text_color=COLORS['text']
-        )
-        title.pack(side="left")
-        
-        # Subtitle
-        subtitle = ctk.CTkLabel(
-            header,
-            text="Convert between PDF, Word, Images & more",
-            font=ctk.CTkFont(family="Segoe UI", size=14),
-            text_color=COLORS['text_secondary']
-        )
-        subtitle.pack(side="left", padx=(15, 0), pady=(8, 0))
+        ctk.CTkLabel(version_frame, text="v1.0", font=ctk.CTkFont(size=10),
+                    text_color=COLORS['text_secondary']).place(relx=0.5, rely=0.5, anchor="center")
         
     def show_upload_screen(self):
-        """Show the upload/drag-drop screen"""
-        # Clear main area
-        for widget in self.main_area.winfo_children():
-            widget.destroy()
+        """Show initial upload screen"""
+        for w in self.main_frame.winfo_children():
+            w.destroy()
             
         # Upload card
-        self.upload_card = ctk.CTkFrame(
-            self.main_area,
-            fg_color=COLORS['surface'],
-            corner_radius=24,
-            border_width=2,
-            border_color=COLORS['border']
-        )
-        self.upload_card.pack(fill="both", expand=True, padx=20, pady=20)
+        card = ctk.CTkFrame(self.main_frame, fg_color=COLORS['card'], 
+                           corner_radius=16, border_width=1, border_color=COLORS['border'])
+        card.pack(fill="both", expand=True, padx=10, pady=10)
         
-        # Bind drag events
-        self.upload_card.bind("<Enter>", lambda e: self.upload_card.configure(border_color=COLORS['primary']))
-        self.upload_card.bind("<Leave>", lambda e: self.upload_card.configure(border_color=COLORS['border']))
-        self.upload_card.bind("<Button-1>", lambda e: self.browse_file())
-        
-        # Content container
-        content = ctk.CTkFrame(self.upload_card, fg_color="transparent")
+        # Center content
+        content = ctk.CTkFrame(card, fg_color="transparent")
         content.place(relx=0.5, rely=0.5, anchor="center")
         
-        # Animated upload icon (using a large label)
-        icon_container = ctk.CTkFrame(content, fg_color=COLORS['surface_light'], corner_radius=30, width=120, height=120)
-        icon_container.pack(pady=(0, 30))
-        icon_container.pack_propagate(False)
-        
-        self.upload_icon = ctk.CTkLabel(
-            icon_container,
-            text="☁️",
-            font=ctk.CTkFont(size=60)
-        )
-        self.upload_icon.place(relx=0.5, rely=0.5, anchor="center")
-        
-        # Title
-        title = ctk.CTkLabel(
-            content,
-            text="Drop your files here",
-            font=ctk.CTkFont(family="Segoe UI", size=28, weight="bold"),
-            text_color=COLORS['text']
-        )
-        title.pack(pady=(0, 10))
-        
-        # Subtitle
-        subtitle = ctk.CTkLabel(
-            content,
-            text="or click to browse from your computer",
-            font=ctk.CTkFont(family="Segoe UI", size=14),
-            text_color=COLORS['text_secondary']
-        )
-        subtitle.pack(pady=(0, 30))
-        
-        # Supported formats chips
-        formats_frame = ctk.CTkFrame(content, fg_color="transparent")
-        formats_frame.pack(pady=(0, 30))
-        
-        formats = ["PDF", "Word", "Markdown", "Images", "Text"]
-        for fmt in formats:
-            chip = ctk.CTkLabel(
-                formats_frame,
-                text=fmt,
-                font=ctk.CTkFont(size=11),
-                fg_color=COLORS['surface_light'],
-                text_color=COLORS['text_secondary'],
-                corner_radius=20,
-                padx=15,
-                pady=6
-            )
-            chip.pack(side="left", padx=5)
-            
-        # Browse button
-        browse_btn = ModernButton(
-            content,
-            text="Browse Files",
-            width=180,
-            height=50,
-            fg_color=COLORS['primary'],
-            hover_color=COLORS['primary_dark'],
-            command=self.browse_file
-        )
-        browse_btn.pack(pady=(10, 0))
-        
-        # Make entire card clickable
-        for widget in [content, title, subtitle, icon_container]:
-            widget.bind("<Button-1>", lambda e: self.browse_file())
-            
-    def show_file_preview(self):
-        """Show file preview and conversion options"""
-        # Clear main area
-        for widget in self.main_area.winfo_children():
-            widget.destroy()
-            
-        # File info card
-        file_card = ctk.CTkFrame(
-            self.main_area,
-            fg_color=COLORS['surface'],
-            corner_radius=20,
-            border_width=1,
-            border_color=COLORS['border']
-        )
-        file_card.pack(fill="x", padx=20, pady=(0, 20))
-        
-        # File icon and info
-        file_header = ctk.CTkFrame(file_card, fg_color="transparent")
-        file_header.pack(fill="x", padx=25, pady=25)
-        
-        ext = self.selected_file['ext']
-        config = FORMAT_CONFIG.get(ext, FORMAT_CONFIG['txt'])
-        
-        # Icon with colored background
-        icon_bg = ctk.CTkFrame(
-            file_header,
-            fg_color=config['color'],
-            corner_radius=16,
-            width=70,
-            height=70
-        )
-        icon_bg.pack(side="left")
+        # Upload icon
+        icon_bg = ctk.CTkFrame(content, fg_color=COLORS['card_hover'], 
+                              corner_radius=20, width=100, height=100)
+        icon_bg.pack(pady=(0, 25))
         icon_bg.pack_propagate(False)
         
-        icon = ctk.CTkLabel(
-            icon_bg,
-            text=config['icon'],
-            font=ctk.CTkFont(size=32)
-        )
-        icon.place(relx=0.5, rely=0.5, anchor="center")
+        ctk.CTkLabel(icon_bg, text="☁️", font=ctk.CTkFont(size=48)).place(
+            relx=0.5, rely=0.5, anchor="center")
         
-        # File details
-        info = ctk.CTkFrame(file_header, fg_color="transparent")
-        info.pack(side="left", padx=(20, 0), fill="y")
+        # Title
+        ctk.CTkLabel(content, text="Drop your files here",
+                    font=ctk.CTkFont(size=22, weight="bold"),
+                    text_color=COLORS['text']).pack()
         
-        name = ctk.CTkLabel(
-            info,
-            text=self.selected_file['name'],
-            font=ctk.CTkFont(family="Segoe UI", size=18, weight="bold"),
-            text_color=COLORS['text']
-        )
-        name.pack(anchor="w")
+        ctk.CTkLabel(content, text="or click to browse from your computer",
+                    font=ctk.CTkFont(size=13),
+                    text_color=COLORS['text_secondary']).pack(pady=(8, 25))
         
-        size_kb = self.selected_file['size'] / 1024
-        details = ctk.CTkLabel(
-            info,
-            text=f"{size_kb:.1f} KB • {config['desc']}",
-            font=ctk.CTkFont(size=12),
-            text_color=COLORS['text_secondary']
-        )
-        details.pack(anchor="w", pady=(4, 0))
+        # Format chips
+        chips = ctk.CTkFrame(content, fg_color="transparent")
+        chips.pack(pady=(0, 25))
         
-        # Change file button
-        change_btn = ctk.CTkButton(
-            file_header,
-            text="✕",
-            width=40,
-            height=40,
-            corner_radius=20,
-            fg_color="transparent",
-            hover_color=COLORS['error'],
-            text_color=COLORS['text_secondary'],
-            font=ctk.CTkFont(size=16),
-            command=self.reset_ui
-        )
-        change_btn.pack(side="right")
+        for text in ["PDF", "Word", "Markdown", "Images", "Text"]:
+            ctk.CTkLabel(chips, text=text, font=ctk.CTkFont(size=11),
+                        fg_color=COLORS['card_hover'], corner_radius=15,
+                        padx=12, pady=5).pack(side="left", padx=4)
         
-        # Conversion options
-        self.show_conversion_options()
-        
-    def show_conversion_options(self):
-        """Show format conversion options"""
-        # Options card
-        options_card = ctk.CTkFrame(
-            self.main_area,
-            fg_color=COLORS['surface'],
-            corner_radius=20,
-            border_width=1,
-            border_color=COLORS['border']
-        )
-        options_card.pack(fill="both", expand=True, padx=20, pady=(0, 20))
-        
-        # Section title
-        title = ctk.CTkLabel(
-            options_card,
-            text="Convert to",
-            font=ctk.CTkFont(family="Segoe UI", size=18, weight="bold"),
-            text_color=COLORS['text']
-        )
-        title.pack(anchor="w", padx=25, pady=(25, 20))
-        
-        # Format buttons grid
-        formats_frame = ctk.CTkFrame(options_card, fg_color="transparent")
-        formats_frame.pack(fill="both", expand=True, padx=25, pady=(0, 20))
-        
-        ext = self.selected_file['ext']
-        available_formats = FORMAT_CONFIG.get(ext, {}).get('converts_to', [])
-        
-        self.format_buttons = {}
-        row, col = 0, 0
-        
-        for i, fmt in enumerate(available_formats):
-            config = FORMAT_CONFIG.get(fmt, {})
-            
-            # Format card
-            card = ctk.CTkFrame(
-                formats_frame,
-                fg_color=COLORS['surface_light'],
-                corner_radius=16,
-                border_width=2,
-                border_color="transparent",
-                width=150,
-                height=120
-            )
-            card.grid(row=row, column=col, padx=10, pady=10, sticky="nsew")
-            card.grid_propagate(False)
-            card.bind("<Enter>", lambda e, c=card: c.configure(border_color=COLORS['primary']))
-            card.bind("<Leave>", lambda e, c=card, f=fmt: c.configure(
-                border_color=COLORS['primary'] if self.target_format == f else "transparent"
-            ))
-            card.bind("<Button-1>", lambda e, f=fmt: self.select_format(f))
-            
-            # Icon
-            icon = ctk.CTkLabel(
-                card,
-                text=config.get('icon', '📄'),
-                font=ctk.CTkFont(size=40)
-            )
-            icon.place(relx=0.5, y=35, anchor="center")
-            icon.bind("<Button-1>", lambda e, f=fmt: self.select_format(f))
-            
-            # Name
-            name = ctk.CTkLabel(
-                card,
-                text=config.get('name', fmt.upper()),
-                font=ctk.CTkFont(family="Segoe UI", size=14, weight="bold"),
-                text_color=COLORS['text']
-            )
-            name.place(relx=0.5, y=75, anchor="center")
-            name.bind("<Button-1>", lambda e, f=fmt: self.select_format(f))
-            
-            self.format_buttons[fmt] = card
-            
-            col += 1
-            if col > 3:
-                col = 0
-                row += 1
-                
-        # Configure grid
-        for c in range(4):
-            formats_frame.grid_columnconfigure(c, weight=1)
-            
-        # Convert button at bottom
-        self.convert_btn = ModernButton(
-            options_card,
-            text="Convert File →",
-            height=55,
-            fg_color=COLORS['primary'],
-            hover_color=COLORS['primary_dark'],
-            state="disabled",
-            command=self.start_conversion
-        )
-        self.convert_btn.pack(fill="x", padx=25, pady=(10, 25))
-        
-    def show_progress(self):
-        """Show conversion progress"""
-        for widget in self.main_area.winfo_children():
-            widget.destroy()
-            
-        # Progress card
-        card = ctk.CTkFrame(
-            self.main_area,
-            fg_color=COLORS['surface'],
-            corner_radius=24
-        )
-        card.pack(fill="both", expand=True, padx=20, pady=20)
-        
-        content = ctk.CTkFrame(card, fg_color="transparent")
-        content.place(relx=0.5, rely=0.5, anchor="center")
-        
-        # Animated spinner (using rotating label)
-        self.spinner = ctk.CTkLabel(
-            content,
-            text="⏳",
-            font=ctk.CTkFont(size=80)
-        )
-        self.spinner.pack(pady=(0, 30))
-        
-        # Start spinner animation
-        self.animate_spinner()
-        
-        # Status
-        self.status_label = ctk.CTkLabel(
-            content,
-            text="Converting your file...",
-            font=ctk.CTkFont(family="Segoe UI", size=24, weight="bold"),
-            text_color=COLORS['text']
-        )
-        self.status_label.pack(pady=(0, 10))
-        
-        # Subtitle
-        subtitle = ctk.CTkLabel(
-            content,
-            text="This may take a few seconds",
-            font=ctk.CTkFont(size=14),
-            text_color=COLORS['text_secondary']
-        )
-        subtitle.pack()
-        
-    def animate_spinner(self):
-        """Animate the spinner"""
-        if hasattr(self, 'spinner') and self.spinner.winfo_exists():
-            spins = ["⏳", "⌛", "⏳", "⌛"]
-            current = self.spinner.cget("text")
-            next_spin = spins[(spins.index(current) + 1) % len(spins)]
-            self.spinner.configure(text=next_spin)
-            self.after(500, self.animate_spinner)
-        
-    def show_success(self, output_path):
-        """Show success screen"""
-        for widget in self.main_area.winfo_children():
-            widget.destroy()
-            
-        card = ctk.CTkFrame(
-            self.main_area,
-            fg_color=COLORS['surface'],
-            corner_radius=24
-        )
-        card.pack(fill="both", expand=True, padx=20, pady=20)
-        
-        content = ctk.CTkFrame(card, fg_color="transparent")
-        content.place(relx=0.5, rely=0.5, anchor="center")
-        
-        # Success icon
-        success_icon = ctk.CTkLabel(
-            content,
-            text="✅",
-            font=ctk.CTkFont(size=80)
-        )
-        success_icon.pack(pady=(0, 20))
-        
-        # Success text
-        title = ctk.CTkLabel(
-            content,
-            text="Conversion Complete!",
-            font=ctk.CTkFont(family="Segoe UI", size=28, weight="bold"),
-            text_color=COLORS['success']
-        )
-        title.pack(pady=(0, 10))
-        
-        # Filename
-        filename = ctk.CTkLabel(
-            content,
-            text=Path(output_path).name,
-            font=ctk.CTkFont(size=14),
-            text_color=COLORS['text_secondary']
-        )
-        filename.pack(pady=(0, 30))
-        
-        # Buttons
-        btn_frame = ctk.CTkFrame(content, fg_color="transparent")
-        btn_frame.pack()
-        
-        open_btn = ModernButton(
-            btn_frame,
-            text="📁 Open Folder",
-            width=150,
-            height=45,
-            fg_color=COLORS['surface_light'],
-            hover_color=COLORS['border'],
-            command=self.open_output_folder
-        )
-        open_btn.pack(side="left", padx=5)
-        
-        again_btn = ModernButton(
-            btn_frame,
-            text="Convert Another",
-            width=150,
-            height=45,
-            fg_color=COLORS['primary'],
-            hover_color=COLORS['primary_dark'],
-            command=self.reset_ui
-        )
-        again_btn.pack(side="left", padx=5)
+        # Browse button
+        ctk.CTkButton(content, text="Browse Files", width=170, height=45,
+                     corner_radius=10, fg_color=COLORS['primary'],
+                     hover_color=COLORS['primary_hover'],
+                     command=self.browse_file).pack()
         
     def browse_file(self):
-        """Open file browser"""
+        """Browse for file"""
         filetypes = [
             ("All Supported", "*.pdf *.docx *.md *.txt *.png *.jpg *.jpeg *.webp *.bmp *.html"),
             ("PDF", "*.pdf"), ("Word", "*.docx"), ("Markdown", "*.md"),
@@ -621,68 +206,138 @@ class FileConverterPro(ctk.CTk):
             ("HTML", "*.html"), ("All Files", "*.*")
         ]
         
-        filepath = filedialog.askopenfilename(title="Select a file", filetypes=filetypes)
-        if filepath:
-            self.process_file(filepath)
+        path = filedialog.askopenfilename(title="Select a file", filetypes=filetypes)
+        if path:
+            ext = Path(path).suffix.lower().lstrip('.')
+            if ext in FORMATS:
+                self.selected_file = {
+                    'path': path,
+                    'name': Path(path).name,
+                    'ext': ext,
+                    'size': Path(path).stat().st_size
+                }
+                self.show_convert_screen()
+            else:
+                messagebox.showerror("Error", f".{ext} not supported")
+                
+    def show_convert_screen(self):
+        """Show file and format selection"""
+        for w in self.main_frame.winfo_children():
+            w.destroy()
             
-    def process_file(self, filepath):
-        """Process selected file"""
-        path = Path(filepath)
-        ext = path.suffix.lower().lstrip('.')
+        # File info card
+        file_card = ctk.CTkFrame(self.main_frame, fg_color=COLORS['card'],
+                                corner_radius=12, border_width=1, border_color=COLORS['border'])
+        file_card.pack(fill="x", padx=10, pady=(0, 15))
         
-        if ext not in FORMAT_CONFIG:
-            messagebox.showerror("Unsupported Format", 
-                f".{ext} files are not supported.\n\nSupported: PDF, DOCX, MD, TXT, PNG, JPG, WEBP, BMP, HTML")
-            return
+        header = ctk.CTkFrame(file_card, fg_color="transparent")
+        header.pack(fill="x", padx=20, pady=20)
+        
+        ext = self.selected_file['ext']
+        cfg = FORMATS[ext]
+        
+        # File icon
+        icon_bg = ctk.CTkFrame(header, fg_color=COLORS['primary'], 
+                              corner_radius=10, width=50, height=50)
+        icon_bg.pack(side="left")
+        icon_bg.pack_propagate(False)
+        ctk.CTkLabel(icon_bg, text=cfg['icon'], font=ctk.CTkFont(size=22)).place(
+            relx=0.5, rely=0.5, anchor="center")
+        
+        # File info
+        info = ctk.CTkFrame(header, fg_color="transparent")
+        info.pack(side="left", padx=(15, 0), fill="y")
+        
+        ctk.CTkLabel(info, text=self.selected_file['name'],
+                    font=ctk.CTkFont(size=15, weight="bold"),
+                    text_color=COLORS['text']).pack(anchor="w")
+        
+        size_kb = self.selected_file['size'] / 1024
+        ctk.CTkLabel(info, text=f"{size_kb:.1f} KB • {cfg['name']}",
+                    font=ctk.CTkFont(size=12),
+                    text_color=COLORS['text_secondary']).pack(anchor="w")
+        
+        # Remove button
+        ctk.CTkButton(header, text="✕", width=35, height=35, corner_radius=17,
+                     fg_color="transparent", hover_color="#ef4444",
+                     command=self.show_upload_screen).pack(side="right")
+        
+        # Format selection card
+        fmt_card = ctk.CTkFrame(self.main_frame, fg_color=COLORS['card'],
+                               corner_radius=12, border_width=1, border_color=COLORS['border'])
+        fmt_card.pack(fill="both", expand=True, padx=10, pady=(0, 15))
+        
+        ctk.CTkLabel(fmt_card, text="Convert to",
+                    font=ctk.CTkFont(size=16, weight="bold"),
+                    text_color=COLORS['text']).pack(anchor="w", padx=20, pady=(20, 15))
+        
+        # Format buttons - use frames with explicit layout
+        available = FORMATS[ext]['to']
+        self.format_buttons = {}
+        
+        # Container for buttons
+        btn_container = ctk.CTkFrame(fmt_card, fg_color="transparent")
+        btn_container.pack(fill="both", expand=True, padx=20, pady=(0, 15))
+        
+        # Create rows of 3 buttons each
+        for i in range(0, len(available), 3):
+            row_frame = ctk.CTkFrame(btn_container, fg_color="transparent")
+            row_frame.pack(fill="x", pady=5)
             
-        self.selected_file = {
-            'path': str(path),
-            'name': path.name,
-            'ext': ext,
-            'size': path.stat().st_size
-        }
+            row_formats = available[i:i+3]
+            for fmt in row_formats:
+                fmt_cfg = FORMATS.get(fmt, {})
+                
+                btn = ctk.CTkButton(row_frame, 
+                                   text=f"{fmt_cfg.get('icon', '📄')}  {fmt_cfg.get('name', fmt.upper())}",
+                                   height=50, corner_radius=10,
+                                   fg_color=COLORS['card_hover'],
+                                   hover_color=COLORS['primary'],
+                                   command=lambda f=fmt: self.select_format(f))
+                btn.pack(side="left", expand=True, fill="x", padx=5)
+                self.format_buttons[fmt] = btn
         
-        self.show_file_preview()
+        # Convert button
+        self.convert_btn = ctk.CTkButton(fmt_card, text="Convert File →", height=50,
+                                        corner_radius=10, fg_color=COLORS['primary'],
+                                        state="disabled", command=self.convert)
+        self.convert_btn.pack(fill="x", padx=20, pady=(10, 20))
         
     def select_format(self, fmt):
-        """Select target format"""
+        """Handle format selection"""
         self.target_format = fmt
         
-        # Update UI
-        for f, card in self.format_buttons.items():
+        # Update button colors
+        for f, btn in self.format_buttons.items():
             if f == fmt:
-                card.configure(border_color=COLORS['primary'], fg_color=COLORS['surface'])
+                btn.configure(fg_color=COLORS['primary'])
             else:
-                card.configure(border_color="transparent", fg_color=COLORS['surface_light'])
+                btn.configure(fg_color=COLORS['card_hover'])
                 
         self.convert_btn.configure(state="normal")
         
-    def start_conversion(self):
+    def convert(self):
         """Start conversion"""
         if not self.selected_file or not self.target_format:
             return
             
-        self.is_converting = True
-        self.show_progress()
+        self.convert_btn.configure(state="disabled", text="Converting...")
         
-        thread = threading.Thread(target=self.convert_file)
-        thread.daemon = True
+        thread = threading.Thread(target=self.do_convert)
         thread.start()
         
-    def convert_file(self):
+    def do_convert(self):
         """Perform conversion"""
         try:
             input_path = self.selected_file['path']
             target = self.target_format
+            ext = self.selected_file['ext']
             
-            input_path_obj = Path(input_path)
-            output_name = f"{input_path_obj.stem}_converted.{target}"
+            output_name = f"{Path(input_path).stem}_converted.{target}"
             output_path = str(self.output_dir / output_name)
             
             # Get converter
-            ext = self.selected_file['ext']
             converter = None
-            
             if ext == 'pdf':
                 converter = PDFConverter()
             elif ext == 'docx':
@@ -696,103 +351,32 @@ class FileConverterPro(ctk.CTk):
             elif ext == 'html':
                 converter = MarkdownConverter()
                 
-            if not converter:
-                raise Exception("No converter available")
-                
-            success = converter.convert(input_path, output_path, target)
-            
-            if success:
-                self.after(0, lambda: self.show_success(output_path))
+            if converter and converter.convert(input_path, output_path, target):
+                self.after(0, lambda: self.conversion_done(output_path))
             else:
-                self.after(0, self.show_error)
+                self.after(0, self.conversion_failed)
                 
         except Exception as e:
             print(f"Error: {e}")
-            self.after(0, lambda: self.show_error(str(e)))
+            self.after(0, lambda: self.conversion_failed(str(e)))
             
-    def show_error(self, error=""):
-        """Show error message"""
-        messagebox.showerror("Conversion Failed", 
-            f"Sorry, the conversion failed.\n\n{error if error else 'Please try again.'}")
-        self.reset_ui()
+    def conversion_done(self, path):
+        """Show success"""
+        name = Path(path).name
+        self.convert_btn.configure(state="normal", text="Convert File →")
         
-    def reset_ui(self):
-        """Reset to initial state"""
-        self.selected_file = None
-        self.target_format = None
-        self.is_converting = False
+        if messagebox.askyesno("Success!", f"Saved: {name}\n\nOpen folder?"):
+            import subprocess
+            subprocess.run(['explorer', str(self.output_dir)])
+            
         self.show_upload_screen()
         
-    def open_output_folder(self):
-        """Open output folder"""
-        import subprocess
-        path = str(self.output_dir)
-        
-        if sys.platform == 'win32':
-            subprocess.run(['explorer', path])
-        elif sys.platform == 'darwin':
-            subprocess.run(['open', path])
-        else:
-            subprocess.run(['xdg-open', path])
-            
-    def nav_clicked(self, label):
-        """Handle navigation click"""
-        if label == "Convert":
-            self.reset_ui()
-        elif label == "Settings":
-            self.show_settings()
-            
-    def show_settings(self):
-        """Show settings dialog"""
-        dialog = ctk.CTkToplevel(self)
-        dialog.title("Settings")
-        dialog.geometry("400x300")
-        dialog.configure(fg_color=COLORS['surface'])
-        
-        # Center
-        dialog.transient(self)
-        dialog.update_idletasks()
-        x = self.winfo_x() + (self.winfo_width() // 2) - 200
-        y = self.winfo_y() + (self.winfo_height() // 2) - 150
-        dialog.geometry(f"+{x}+{y}")
-        
-        title = ctk.CTkLabel(
-            dialog,
-            text="Settings",
-            font=ctk.CTkFont(family="Segoe UI", size=20, weight="bold")
-        )
-        title.pack(pady=20)
-        
-        info = ctk.CTkLabel(
-            dialog,
-            text="File Converter Pro v1.0\nConvert between document formats",
-            font=ctk.CTkFont(size=12),
-            text_color=COLORS['text_secondary']
-        )
-        info.pack(pady=20)
-        
-        btn = ModernButton(dialog, text="Close", command=dialog.destroy)
-        btn.pack(pady=20)
-
-
-def main():
-    print("Starting File Converter Pro...")
-    try:
-        print("Creating app instance...")
-        app = FileConverterPro()
-        print("App created, starting main loop...")
-        app.mainloop()
-    except Exception as e:
-        import traceback
-        print("\n========================================")
-        print("ERROR STARTING APP:")
-        print("========================================")
-        print(str(e))
-        print("\nFull traceback:")
-        traceback.print_exc()
-        print("========================================")
-        input("\nPress Enter to exit...")
+    def conversion_failed(self, error=""):
+        """Show error"""
+        self.convert_btn.configure(state="normal", text="Convert File →")
+        messagebox.showerror("Error", f"Failed.\n{error[:100] if error else ''}")
 
 
 if __name__ == "__main__":
-    main()
+    app = FileConverterPro()
+    app.mainloop()
