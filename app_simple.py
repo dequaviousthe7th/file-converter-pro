@@ -45,6 +45,8 @@ class SimpleConverter:
         
         self.selected_file = None
         self.target_format = None
+        self.conversion_thread = None
+        self.stop_requested = False
         self.output_dir = Path(__file__).parent / "converted"
         self.output_dir.mkdir(exist_ok=True)
         
@@ -130,16 +132,18 @@ class SimpleConverter:
         self.format_placeholder = ttk.Label(self.format_frame, text="Select a file first", foreground="gray")
         self.format_placeholder.pack(pady=15)
         
-        # Convert button - BLUE
-        self.convert_btn = tk.Button(main, text="Convert File", command=self.convert, state="disabled",
-                                     bg="#5ba3e8", fg="white", font=("Segoe UI", 10, "bold"),
-                                     activebackground="#4a92d0", activeforeground="white")
-        self.convert_btn.pack(fill="x", pady=(0, 10))
+        # Convert button - Standard style like Open Output Folder, but bigger
+        self.convert_btn = ttk.Button(main, text="Convert File", command=self.convert, state="disabled")
+        self.convert_btn.pack(fill="x", pady=(0, 10), ipady=8)
         
         # Progress bar (hidden initially)
         self.progress = ttk.Progressbar(main, mode="determinate", maximum=100)
-        self.progress.pack(fill="x", pady=(0, 10))
+        self.progress.pack(fill="x", pady=(0, 5))
         self.progress["value"] = 0
+        
+        # Stop button (disabled initially)
+        self.stop_btn = ttk.Button(main, text="⏹ Stop", command=self.stop_conversion, state="disabled")
+        self.stop_btn.pack(anchor="e", pady=(0, 10))
         
         # Status
         self.status = ttk.Label(main, text="Ready", foreground="gray")
@@ -213,6 +217,7 @@ class SimpleConverter:
             return
             
         self.convert_btn.configure(state="disabled", text="Converting...")
+        self.stop_btn.configure(state="normal")
         self.status.configure(text="Converting...")
         self.progress["value"] = 0
         self.root.update()
@@ -220,8 +225,16 @@ class SimpleConverter:
         # Start progress animation
         self.animate_progress()
         
-        thread = threading.Thread(target=self.do_convert)
-        thread.start()
+        self.conversion_thread = threading.Thread(target=self.do_convert)
+        self.conversion_thread.start()
+        
+    def stop_conversion(self):
+        """Stop the conversion (best effort)"""
+        self.status.configure(text="Stopping...")
+        # Note: Can't truly stop a thread in Python, but we can mark it
+        # The conversion will finish but we'll ignore the result
+        self.stop_requested = True
+        self.stop_btn.configure(state="disabled")
         
     def animate_progress(self):
         """Animate progress bar during conversion"""
@@ -271,8 +284,13 @@ class SimpleConverter:
             self.root.after(0, lambda msg=error_msg: self.failed(msg))
             
     def done(self, path):
+        if self.stop_requested:
+            self.reset()
+            self.stop_requested = False
+            return
         self.progress["value"] = 100
         self.convert_btn.configure(state="normal", text="Convert File")
+        self.stop_btn.configure(state="disabled")
         name = Path(path).name
         self.status.configure(text=f"Saved: {name}")
         
@@ -281,8 +299,10 @@ class SimpleConverter:
         self.reset()
         
     def failed(self, error=""):
+        self.stop_requested = False
         self.progress["value"] = 0
         self.convert_btn.configure(state="normal", text="Convert File")
+        self.stop_btn.configure(state="disabled")
         self.status.configure(text="Failed")
         messagebox.showerror("Error", f"Conversion failed.\n{error[:200]}")
         
@@ -303,6 +323,7 @@ class SimpleConverter:
         
         self.format_placeholder.pack(pady=15)
         self.convert_btn.configure(state="disabled")
+        self.stop_btn.configure(state="disabled")
         self.progress["value"] = 0
         self.status.configure(text="Ready", foreground="gray")
         
