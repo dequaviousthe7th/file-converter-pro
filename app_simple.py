@@ -222,10 +222,11 @@ class SimpleConverter:
             else:
                 self.root.after(0, lambda: self.failed("Conversion failed"))
         except Exception as e:
-            print(f"Error: {e}")
+            error_msg = str(e)
+            print(f"Error: {error_msg}")
             import traceback
             traceback.print_exc()
-            self.root.after(0, lambda: self.failed(str(e)))
+            self.root.after(0, lambda msg=error_msg: self.failed(msg))
             
     def done(self, path):
         self.convert_btn.configure(state="normal", text="Convert File")
