@@ -56,3 +56,9 @@ htmlcov/
 
 # Plans (keep local)
 PPlan/
+
+# Screenshots (tracked separately or not at all)
+screenshot_*.png
+
+# App data
+.file-converter-pro/

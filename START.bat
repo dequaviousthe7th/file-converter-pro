@@ -5,8 +5,8 @@ call venv\Scripts\activate
 REM Check if customtkinter is installed
 python -c "import customtkinter" 2>nul
 if errorlevel 1 (
-    echo Installing customtkinter...
-    pip install customtkinter pillow
+    echo Installing dependencies...
+    pip install -r requirements.txt
 )
 
 python app.py
