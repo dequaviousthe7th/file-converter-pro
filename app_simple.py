@@ -38,6 +38,14 @@ class SimpleConverter:
         self.root.resizable(True, True)
         self.root.minsize(350, 530)
 
+        # Set window icon
+        icon_path = Path(__file__).parent / "assets" / "logo.ico"
+        if icon_path.exists():
+            try:
+                self.root.iconbitmap(str(icon_path))
+            except Exception:
+                pass
+
         self.center_window()
 
         self.selected_file = None
@@ -171,8 +179,18 @@ class SimpleConverter:
         title_frame.pack(side="left")
 
         ttk.Label(title_frame, text=APP_NAME, font=("Segoe UI", 16, "bold")).pack(anchor="w")
-        ttk.Label(title_frame, text=f"Built by: {AUTHOR}", font=("Segoe UI", 8),
-                  foreground="gray").pack(anchor="w")
+        credit_row = ttk.Frame(title_frame)
+        credit_row.pack(anchor="w")
+
+        ttk.Label(credit_row, text="Built by:", font=("Segoe UI", 8),
+                  foreground="gray").pack(side="left", padx=(0, 2))
+
+        author_link = tk.Label(credit_row, text=AUTHOR, font=("Segoe UI", 8),
+                               fg="#5ba3e8", bg="#f0f0f0", cursor="hand2", padx=0)
+        author_link.pack(side="left", padx=0)
+        author_link.bind("<Enter>", lambda e: author_link.configure(fg="#3d8bd4"))
+        author_link.bind("<Leave>", lambda e: author_link.configure(fg="#5ba3e8"))
+        author_link.bind("<Button-1>", lambda e: __import__('webbrowser').open("https://github.com/dequaviousthe7th"))
 
         # Batch mode toggle
         batch_frame = ttk.Frame(main)
