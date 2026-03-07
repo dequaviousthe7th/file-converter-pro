@@ -25,14 +25,14 @@ except ImportError:
 try:
     import cairosvg
     CAIROSVG_AVAILABLE = True
-except ImportError:
+except (ImportError, OSError):
     CAIROSVG_AVAILABLE = False
 
 try:
     from pillow_heif import register_heif_opener
     register_heif_opener()
     HEIF_AVAILABLE = True
-except ImportError:
+except (ImportError, OSError):
     HEIF_AVAILABLE = False
 
 
