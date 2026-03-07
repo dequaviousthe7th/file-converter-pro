@@ -107,42 +107,17 @@ Ships with two UI modes:
 
 ## Quick Start
 
-### Installation Wizard (Recommended)
+### Installation
 
-The easiest way to get started. No coding knowledge required.
+Download and run **File Converter Pro Setup.exe**. The setup wizard will:
 
-**Windows** — double-click `INSTALL.bat`
-
-**macOS / Linux** — run `./install.sh` in terminal
-
-The wizard will:
-1. Set up a Python virtual environment
-2. Install all required packages
-3. Let you choose your preferred UI
+1. Set up everything automatically
+2. Let you choose your preferred UI
+3. Install all required packages
 4. Create a desktop shortcut
 5. Launch the app
 
-### Manual Setup
-
-If you prefer to set things up yourself:
-
-```bash
-# Create virtual environment
-python3 -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Generate app logo
-python assets/generate_logo.py
-
-# Run Advanced UI
-python app.py
-
-# Run Simple UI
-python app_simple.py
-```
+No coding knowledge required.
 
 ### System Dependencies
 
@@ -175,8 +150,7 @@ Some conversions require external tools:
 ```
 File-Converter/
 ├── install.py                 # Installation wizard
-├── INSTALL.bat                # Windows installer launcher
-├── install.sh                 # macOS/Linux installer launcher
+├── build_installer.py         # Builds Setup.exe
 ├── app.py                     # Advanced UI
 ├── app_simple.py              # Simple UI
 ├── config.py                  # Format registry & app config
