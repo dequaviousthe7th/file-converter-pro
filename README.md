@@ -20,7 +20,9 @@
 </p>
 
 <p align="center">
-  <img src="assets/Advanced-UI.png" alt="Advanced UI" width="800"/>
+  <img src="assets/Advanced-UI.png" alt="Advanced UI" width="62%"/>
+  &nbsp;&nbsp;
+  <img src="assets/Simple-UI.png" alt="Simple UI" width="28%"/>
 </p>
 
 ---
@@ -41,10 +43,6 @@ Ships with two UI modes:
 | **Settings** | - | Output folder, quality, bitrate |
 | **Drag & Drop** | Yes | Yes |
 | **Kill Button** | Yes | Yes |
-
-<p align="center">
-  <img src="assets/Simple-UI.png" alt="Simple UI" width="400"/>
-</p>
 
 ---
 
