@@ -19,16 +19,15 @@
   <img src="https://img.shields.io/badge/Formats-55+-00d4aa.svg" alt="55+ Formats"/>
 </p>
 
-<table align="center">
-  <tr>
-    <td align="center"><b>Advanced UI</b></td>
-    <td align="center"><b>Simple UI</b></td>
-  </tr>
-  <tr>
-    <td><img src="assets/Advanced-UI.png" alt="Advanced UI" width="600"/></td>
-    <td><img src="assets/Simple-UI.png" alt="Simple UI" width="280"/></td>
-  </tr>
-</table>
+<p align="center"><b>Advanced UI</b></p>
+<p align="center">
+  <img src="assets/Advanced-UI.png" alt="Advanced UI" width="800"/>
+</p>
+
+<p align="center"><b>Simple UI</b></p>
+<p align="center">
+  <img src="assets/Simple-UI.png" alt="Simple UI" width="450"/>
+</p>
 
 ---
 
