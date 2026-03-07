@@ -53,9 +53,11 @@ Source: "..\dist\File Converter Pro\*"; DestDir: "{app}\Advanced"; Flags: ignore
 ; Simple UI (compiled exe + all dependencies)
 Source: "..\dist\File Converter Pro Simple\*"; DestDir: "{app}\Simple"; Flags: ignoreversion recursesubdirs createallsubdirs
 
-; Assets (for icon references)
+; Assets (for icon references and installer previews)
 Source: "..\assets\logo.ico"; DestDir: "{app}\assets"; Flags: ignoreversion
 Source: "..\assets\logo.png"; DestDir: "{app}\assets"; Flags: ignoreversion
+Source: "..\assets\Advanced-UI-preview.bmp"; Flags: dontcopy
+Source: "..\assets\Simple-UI-preview.bmp"; Flags: dontcopy
 
 ; License
 Source: "..\LICENSE"; DestDir: "{app}"; Flags: ignoreversion
@@ -143,115 +145,125 @@ end;
 
 procedure CreateUIPage;
 var
-  TitleLabel: TNewStaticText;
+  AdvancedImage: TBitmapImage;
+  SimpleImage: TBitmapImage;
+  AdvancedLabel: TNewStaticText;
+  SimpleLabel: TNewStaticText;
   Separator1: TBevel;
-  Separator2: TBevel;
   AdvancedDesc: TNewStaticText;
-  AdvancedFeatures: TNewStaticText;
   SimpleDesc: TNewStaticText;
-  SimpleFeatures: TNewStaticText;
   NoteLabel: TNewStaticText;
+  ColW: Integer;
+  Col2Left: Integer;
 begin
   UIPage := CreateCustomPage(wpLicense,
     'Choose Your Default Interface',
     'Both UIs are always installed. Select which one to use as your default.');
 
-  TitleLabel := TNewStaticText.Create(UIPage);
-  TitleLabel.Parent := UIPage.Surface;
-  TitleLabel.Caption := 'File Converter Pro ships with two UI modes:';
-  TitleLabel.Font.Size := 10;
-  TitleLabel.Left := 0;
-  TitleLabel.Top := 4;
-  TitleLabel.Width := UIPage.SurfaceWidth;
+  ColW := (UIPage.SurfaceWidth - 16) div 2;
+  Col2Left := ColW + 16;
 
-  // === Advanced UI ===
+  // === Preview Images Side by Side ===
+  ExtractTemporaryFile('Advanced-UI-preview.bmp');
+  AdvancedImage := TBitmapImage.Create(UIPage);
+  AdvancedImage.Parent := UIPage.Surface;
+  AdvancedImage.Bitmap.LoadFromFile(ExpandConstant('{tmp}\Advanced-UI-preview.bmp'));
+  AdvancedImage.Left := 0;
+  AdvancedImage.Top := 0;
+  AdvancedImage.Width := 195;
+  AdvancedImage.Height := 130;
+  AdvancedImage.Stretch := True;
+
+  ExtractTemporaryFile('Simple-UI-preview.bmp');
+  SimpleImage := TBitmapImage.Create(UIPage);
+  SimpleImage.Parent := UIPage.Surface;
+  SimpleImage.Bitmap.LoadFromFile(ExpandConstant('{tmp}\Simple-UI-preview.bmp'));
+  SimpleImage.Left := Col2Left;
+  SimpleImage.Top := 0;
+  SimpleImage.Width := 195;
+  SimpleImage.Height := 130;
+  SimpleImage.Stretch := True;
+
+  // === Labels under images ===
+  AdvancedLabel := TNewStaticText.Create(UIPage);
+  AdvancedLabel.Parent := UIPage.Surface;
+  AdvancedLabel.Caption := 'Advanced UI';
+  AdvancedLabel.Font.Size := 9;
+  AdvancedLabel.Font.Style := [fsBold];
+  AdvancedLabel.Left := 60;
+  AdvancedLabel.Top := 133;
+
+  SimpleLabel := TNewStaticText.Create(UIPage);
+  SimpleLabel.Parent := UIPage.Surface;
+  SimpleLabel.Caption := 'Simple UI';
+  SimpleLabel.Font.Size := 9;
+  SimpleLabel.Font.Style := [fsBold];
+  SimpleLabel.Left := Col2Left + 60;
+  SimpleLabel.Top := 133;
+
+  Separator1 := TBevel.Create(UIPage);
+  Separator1.Parent := UIPage.Surface;
+  Separator1.Left := 0;
+  Separator1.Top := 155;
+  Separator1.Width := UIPage.SurfaceWidth;
+  Separator1.Height := 2;
+  Separator1.Shape := bsTopLine;
+
+  // === Advanced UI Radio ===
   AdvancedButton := TNewRadioButton.Create(UIPage);
   AdvancedButton.Parent := UIPage.Surface;
   AdvancedButton.Caption := 'Advanced UI  -  Modern Dark Theme';
   AdvancedButton.Font.Size := 10;
   AdvancedButton.Font.Style := [fsBold];
   AdvancedButton.Left := 0;
-  AdvancedButton.Top := 36;
+  AdvancedButton.Top := 165;
   AdvancedButton.Width := UIPage.SurfaceWidth;
   AdvancedButton.Height := 22;
   AdvancedButton.Checked := True;
 
   AdvancedDesc := TNewStaticText.Create(UIPage);
   AdvancedDesc.Parent := UIPage.Surface;
-  AdvancedDesc.Caption := 'Best for power users and batch workflows.';
+  AdvancedDesc.Caption :=
+    'Power users & batch workflows. Dark studio theme, tab navigation,' + #13#10 +
+    'history tracking, configurable output/quality settings, drag & drop.';
   AdvancedDesc.Left := 20;
-  AdvancedDesc.Top := 60;
+  AdvancedDesc.Top := 189;
   AdvancedDesc.Width := UIPage.SurfaceWidth - 20;
+  AdvancedDesc.AutoSize := False;
+  AdvancedDesc.Height := 30;
+  AdvancedDesc.WordWrap := True;
   AdvancedDesc.Font.Color := clGray;
 
-  AdvancedFeatures := TNewStaticText.Create(UIPage);
-  AdvancedFeatures.Parent := UIPage.Surface;
-  AdvancedFeatures.Caption :=
-    '    - Modern dark studio theme (CustomTkinter)' + #13#10 +
-    '    - Tab navigation with dedicated batch conversion page' + #13#10 +
-    '    - Full conversion history tracking' + #13#10 +
-    '    - Configurable output folder, image quality, audio bitrate' + #13#10 +
-    '    - Drag and drop support';
-  AdvancedFeatures.Left := 20;
-  AdvancedFeatures.Top := 78;
-  AdvancedFeatures.Width := UIPage.SurfaceWidth - 20;
-  AdvancedFeatures.Height := 76;
-  AdvancedFeatures.Font.Color := clGray;
-
-  Separator1 := TBevel.Create(UIPage);
-  Separator1.Parent := UIPage.Surface;
-  Separator1.Left := 0;
-  Separator1.Top := 160;
-  Separator1.Width := UIPage.SurfaceWidth;
-  Separator1.Height := 2;
-  Separator1.Shape := bsTopLine;
-
-  // === Simple UI ===
+  // === Simple UI Radio ===
   SimpleButton := TNewRadioButton.Create(UIPage);
   SimpleButton.Parent := UIPage.Surface;
   SimpleButton.Caption := 'Simple UI  -  Classic Lightweight';
   SimpleButton.Font.Size := 10;
   SimpleButton.Font.Style := [fsBold];
   SimpleButton.Left := 0;
-  SimpleButton.Top := 170;
+  SimpleButton.Top := 226;
   SimpleButton.Width := UIPage.SurfaceWidth;
   SimpleButton.Height := 22;
   SimpleButton.Checked := False;
 
   SimpleDesc := TNewStaticText.Create(UIPage);
   SimpleDesc.Parent := UIPage.Surface;
-  SimpleDesc.Caption := 'Best for quick single-file conversions.';
+  SimpleDesc.Caption :=
+    'Quick single-file conversions. Clean classic interface, batch mode' + #13#10 +
+    'toggle, drag & drop, kill button to cancel any conversion.';
   SimpleDesc.Left := 20;
-  SimpleDesc.Top := 194;
+  SimpleDesc.Top := 250;
   SimpleDesc.Width := UIPage.SurfaceWidth - 20;
+  SimpleDesc.AutoSize := False;
+  SimpleDesc.Height := 30;
+  SimpleDesc.WordWrap := True;
   SimpleDesc.Font.Color := clGray;
-
-  SimpleFeatures := TNewStaticText.Create(UIPage);
-  SimpleFeatures.Parent := UIPage.Surface;
-  SimpleFeatures.Caption :=
-    '    - Clean, lightweight classic interface (Standard Tkinter)' + #13#10 +
-    '    - Batch mode toggle for multiple files' + #13#10 +
-    '    - Drag and drop support' + #13#10 +
-    '    - Kill button to cancel any conversion';
-  SimpleFeatures.Left := 20;
-  SimpleFeatures.Top := 212;
-  SimpleFeatures.Width := UIPage.SurfaceWidth - 20;
-  SimpleFeatures.Height := 64;
-  SimpleFeatures.Font.Color := clGray;
-
-  Separator2 := TBevel.Create(UIPage);
-  Separator2.Parent := UIPage.Surface;
-  Separator2.Left := 0;
-  Separator2.Top := 284;
-  Separator2.Width := UIPage.SurfaceWidth;
-  Separator2.Height := 2;
-  Separator2.Shape := bsTopLine;
 
   NoteLabel := TNewStaticText.Create(UIPage);
   NoteLabel.Parent := UIPage.Surface;
-  NoteLabel.Caption := 'Both UIs are always installed. You can switch anytime via Start Menu shortcuts or the built-in switch button.';
+  NoteLabel.Caption := 'Both UIs are always installed. Switch anytime via Start Menu or the built-in switch button.';
   NoteLabel.Left := 0;
-  NoteLabel.Top := 294;
+  NoteLabel.Top := 290;
   NoteLabel.Width := UIPage.SurfaceWidth;
   NoteLabel.AutoSize := False;
   NoteLabel.Height := 30;
