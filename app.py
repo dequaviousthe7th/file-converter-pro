@@ -74,12 +74,7 @@ class FileConverterPro(ctk.CTk):
         self.configure(fg_color=T['bg'])
 
         # Set window icon
-        icon_path = Path(__file__).parent / "assets" / "logo.ico"
-        if icon_path.exists():
-            try:
-                self.iconbitmap(str(icon_path))
-            except Exception:
-                pass
+        self._set_icon()
 
         self.selected_file = None
         self.target_format = None
@@ -104,6 +99,24 @@ class FileConverterPro(ctk.CTk):
         self._show_tab("convert")
 
     # ── Window Setup ──────────────────────────────────────
+
+    def _set_icon(self):
+        """Set the window icon using multiple methods for reliability."""
+        assets = Path(__file__).parent / "assets"
+        try:
+            ico = assets / "logo.ico"
+            if ico.exists():
+                self.iconbitmap(str(ico))
+        except Exception:
+            pass
+        try:
+            png = assets / "logo.png"
+            if png.exists():
+                icon_img = tk.PhotoImage(file=str(png))
+                self.iconphoto(True, icon_img)
+                self._icon_ref = icon_img  # prevent garbage collection
+        except Exception:
+            pass
 
     def _center_window(self):
         self.update_idletasks()

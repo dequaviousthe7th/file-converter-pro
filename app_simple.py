@@ -39,12 +39,7 @@ class SimpleConverter:
         self.root.minsize(350, 530)
 
         # Set window icon
-        icon_path = Path(__file__).parent / "assets" / "logo.ico"
-        if icon_path.exists():
-            try:
-                self.root.iconbitmap(str(icon_path))
-            except Exception:
-                pass
+        self._set_icon()
 
         self.center_window()
 
@@ -63,6 +58,24 @@ class SimpleConverter:
 
         self.create_ui()
         self._setup_drag_drop()
+
+    def _set_icon(self):
+        """Set the window icon using multiple methods for reliability."""
+        assets = Path(__file__).parent / "assets"
+        try:
+            ico = assets / "logo.ico"
+            if ico.exists():
+                self.root.iconbitmap(str(ico))
+        except Exception:
+            pass
+        try:
+            png = assets / "logo.png"
+            if png.exists():
+                icon_img = tk.PhotoImage(file=str(png))
+                self.root.iconphoto(True, icon_img)
+                self._icon_ref = icon_img
+        except Exception:
+            pass
 
     def center_window(self):
         self.root.update_idletasks()

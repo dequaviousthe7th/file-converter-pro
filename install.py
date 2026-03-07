@@ -19,7 +19,15 @@ from pathlib import Path
 APP_NAME = "File Converter Pro"
 VERSION = "2.0.0"
 AUTHOR = "Dequavious"
-APP_DIR = Path(__file__).parent.resolve()
+
+# Support running as PyInstaller bundle or normal script
+if getattr(sys, 'frozen', False):
+    # Running as compiled exe — assets bundled inside
+    BUNDLE_DIR = Path(sys._MEIPASS)
+    APP_DIR = Path(sys.executable).parent.resolve()
+else:
+    BUNDLE_DIR = Path(__file__).parent.resolve()
+    APP_DIR = BUNDLE_DIR
 
 SYSTEM = platform.system()  # Windows, Darwin, Linux
 
@@ -121,13 +129,25 @@ class InstallWizard:
         self.root.resizable(False, False)
         self.root.configure(bg=COLORS['bg'])
 
-        # Set icon if available
-        icon_path = APP_DIR / "assets" / "logo.ico"
+        # Set icon if available (look in bundle dir for assets)
+        icon_path = BUNDLE_DIR / "assets" / "logo.ico"
         if icon_path.exists():
             try:
                 self.root.iconbitmap(str(icon_path))
             except Exception:
                 pass
+        self._logo_img = None
+        try:
+            logo_path = BUNDLE_DIR / "assets" / "logo.png"
+            if logo_path.exists():
+                img = tk.PhotoImage(file=str(logo_path))
+                self.root.iconphoto(True, img)
+                # Subsample for welcome page display (~80px)
+                factor = max(1, img.width() // 80)
+                self._logo_img = img.subsample(factor, factor)
+                self._logo_img_full = img  # keep reference
+        except Exception:
+            pass
 
         self._center()
 
@@ -160,8 +180,8 @@ class InstallWizard:
     def _load_previews(self):
         """Try to load preview images for UI selection."""
         try:
-            adv_path = APP_DIR / "assets" / "Advanced-UI.png"
-            simple_path = APP_DIR / "assets" / "Simple-UI.png"
+            adv_path = BUNDLE_DIR / "assets" / "Advanced-UI.png"
+            simple_path = BUNDLE_DIR / "assets" / "Simple-UI.png"
             if adv_path.exists():
                 self._adv_img = tk.PhotoImage(file=str(adv_path))
                 # Subsample to fit (roughly 280px wide)
@@ -322,9 +342,14 @@ class InstallWizard:
     # ── Step 1: Welcome ───────────────────────────────────
 
     def _step_welcome(self):
+        # Logo
+        if self._logo_img:
+            tk.Label(self.content, image=self._logo_img,
+                     bg=COLORS['bg']).pack(pady=(10, 6))
+
         tk.Label(self.content, text=f"Welcome to {APP_NAME}",
                  font=("Segoe UI", 22, "bold"), bg=COLORS['bg'],
-                 fg=COLORS['text']).pack(pady=(20, 6))
+                 fg=COLORS['text']).pack(pady=(4, 6))
 
         tk.Label(self.content, text=f"Version {VERSION}",
                  font=("Segoe UI", 12), bg=COLORS['bg'],
