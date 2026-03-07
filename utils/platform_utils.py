@@ -75,12 +75,20 @@ def find_system_font():
     return None
 
 
+def _no_window_kwargs():
+    """Return subprocess kwargs to hide console window on Windows."""
+    if os.name == 'nt':
+        return {'creationflags': 0x08000000}
+    return {}
+
+
 def check_ffmpeg():
     """Check if ffmpeg is installed and accessible."""
     try:
         result = subprocess.run(
             ["ffmpeg", "-version"],
-            capture_output=True, text=True, timeout=5
+            capture_output=True, text=True, timeout=5,
+            **_no_window_kwargs()
         )
         return result.returncode == 0
     except (FileNotFoundError, subprocess.TimeoutExpired):

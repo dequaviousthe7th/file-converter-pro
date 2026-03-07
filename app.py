@@ -303,19 +303,18 @@ class FileConverterPro(ctk.CTk):
 
     def _switch_to_simple(self):
         """Launch Simple UI and close this one."""
+        kw = {'creationflags': 0x08000000} if os.name == 'nt' else {}
         if getattr(sys, 'frozen', False):
-            # Running as compiled exe
             exe_dir = Path(sys.executable).parent
             simple_exe = exe_dir.parent / "Simple" / "File Converter Pro Simple.exe"
             if simple_exe.exists():
-                subprocess.Popen([str(simple_exe)], cwd=str(simple_exe.parent))
+                subprocess.Popen([str(simple_exe)], cwd=str(simple_exe.parent), **kw)
                 self.destroy()
                 return
-        # Running as Python script
         python = sys.executable
         script = Path(__file__).parent / "app_simple.py"
         if script.exists():
-            subprocess.Popen([python, str(script)], cwd=str(script.parent))
+            subprocess.Popen([python, str(script)], cwd=str(script.parent), **kw)
             self.destroy()
 
     def _show_tab(self, tab_id):

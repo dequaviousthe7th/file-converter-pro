@@ -20,6 +20,26 @@ try:
 except ImportError:
     DOCX2PDF_AVAILABLE = False
 
+try:
+    import subprocess as _sp
+    _kw = {}
+    if os.name == 'nt':
+        _kw['creationflags'] = 0x08000000  # CREATE_NO_WINDOW
+    _sp.run(['pandoc', '--version'], capture_output=True, timeout=5, **_kw)
+    PANDOC_AVAILABLE = True
+except Exception:
+    PANDOC_AVAILABLE = False
+
+try:
+    from reportlab.lib.pagesizes import letter
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+    from reportlab.lib import colors
+    from reportlab.lib.units import inch
+    REPORTLAB_AVAILABLE = True
+except ImportError:
+    REPORTLAB_AVAILABLE = False
+
 
 class WordConverter(BaseConverter):
     """Convert Word (DOCX) files to various formats"""
@@ -39,41 +59,133 @@ class WordConverter(BaseConverter):
 
     def _to_pdf(self, input_path: str, output_path: str) -> bool:
         self.report_progress(10, "Converting Word to PDF...")
-        if DOCX2PDF_AVAILABLE:
+
+        # Method 1: Direct Word COM automation (best quality, preserves all styling)
+        if os.name == 'nt':
             try:
-                docx2pdf.convert(input_path, output_path)
-                self.report_progress(100, "Done")
-                return True
+                import win32com.client
+                self.report_progress(15, "Opening Microsoft Word...")
+                word = win32com.client.Dispatch("Word.Application")
+                word.Visible = False
+                word.DisplayAlerts = False
+                abs_in = os.path.abspath(input_path)
+                abs_out = os.path.abspath(output_path)
+                doc = word.Documents.Open(abs_in, ReadOnly=True)
+                self.report_progress(50, "Saving as PDF...")
+                doc.SaveAs2(abs_out, FileFormat=17)  # 17 = wdFormatPDF
+                doc.Close(False)
+                word.Quit()
+                if os.path.exists(output_path):
+                    self.report_progress(100, "Done")
+                    return True
             except Exception:
                 pass
 
-        # Fallback: LibreOffice
-        self.report_progress(30, "Trying LibreOffice fallback...")
-        return self._convert_with_libreoffice(input_path, output_path)
+        # Method 2: Pandoc
+        if PANDOC_AVAILABLE:
+            try:
+                self.report_progress(30, "Converting via Pandoc...")
+                import subprocess
+                kw = {}
+                if os.name == 'nt':
+                    kw['creationflags'] = 0x08000000
+                result = subprocess.run(
+                    ['pandoc', input_path, '-o', output_path],
+                    capture_output=True, text=True, timeout=120, **kw
+                )
+                if result.returncode == 0 and os.path.exists(output_path):
+                    self.report_progress(100, "Done")
+                    return True
+            except Exception:
+                pass
+
+        # Method 3: LibreOffice
+        try:
+            self.report_progress(50, "Trying LibreOffice...")
+            return self._convert_with_libreoffice(input_path, output_path)
+        except Exception:
+            pass
+
+        # Method 4: Pure Python (reportlab + python-docx)
+        if REPORTLAB_AVAILABLE and PYTHON_DOCX_AVAILABLE:
+            self.report_progress(60, "Converting via reportlab...")
+            return self._convert_with_reportlab(input_path, output_path)
+
+        raise ConversionError(
+            "DOCX to PDF failed — no conversion method available",
+            "Install Pandoc for best results"
+        )
 
     def _convert_with_libreoffice(self, input_path: str, output_path: str) -> bool:
-        try:
-            import subprocess
-            output_dir = os.path.dirname(output_path)
-            cmd = [
-                'libreoffice', '--headless', '--convert-to', 'pdf',
-                '--outdir', output_dir, input_path
-            ]
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+        import subprocess
+        output_dir = os.path.dirname(output_path)
+        cmd = [
+            'libreoffice', '--headless', '--convert-to', 'pdf',
+            '--outdir', output_dir, input_path
+        ]
+        kw = {}
+        if os.name == 'nt':
+            kw['creationflags'] = 0x08000000
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=60, **kw)
 
-            if result.returncode == 0:
-                base_name = Path(input_path).stem
-                expected_output = os.path.join(output_dir, f"{base_name}.pdf")
-                if os.path.exists(expected_output) and expected_output != output_path:
-                    os.rename(expected_output, output_path)
-                self.report_progress(100, "Done")
-                return True
-            raise ConversionError("LibreOffice conversion failed")
-        except ConversionError:
-            raise
-        except Exception as e:
-            raise ConversionError(f"DOCX to PDF failed: {e}",
-                                  "Install docx2pdf or LibreOffice")
+        if result.returncode == 0:
+            base_name = Path(input_path).stem
+            expected_output = os.path.join(output_dir, f"{base_name}.pdf")
+            if os.path.exists(expected_output) and expected_output != output_path:
+                os.rename(expected_output, output_path)
+            self.report_progress(100, "Done")
+            return True
+        raise ConversionError("LibreOffice conversion failed")
+
+    def _convert_with_reportlab(self, input_path: str, output_path: str) -> bool:
+        doc = Document(input_path)
+        pdf = SimpleDocTemplate(output_path, pagesize=letter,
+                                leftMargin=72, rightMargin=72,
+                                topMargin=72, bottomMargin=72)
+        styles = getSampleStyleSheet()
+        story = []
+
+        for para in doc.paragraphs:
+            self.check_cancel()
+            text = para.text.strip()
+            if not text:
+                story.append(Spacer(1, 6))
+                continue
+
+            safe_text = text.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+            style_name = para.style.name.lower() if para.style else ""
+
+            if 'heading 1' in style_name:
+                story.append(Paragraph(safe_text, styles['Heading1']))
+            elif 'heading 2' in style_name:
+                story.append(Paragraph(safe_text, styles['Heading2']))
+            elif 'heading 3' in style_name:
+                story.append(Paragraph(safe_text, styles['Heading3']))
+            else:
+                story.append(Paragraph(safe_text, styles['Normal']))
+
+        for table in doc.tables:
+            self.check_cancel()
+            data = []
+            for row in table.rows:
+                data.append([cell.text.strip() for cell in row.cells])
+            if data:
+                t = Table(data)
+                t.setStyle(TableStyle([
+                    ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+                    ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#e0e0e0')),
+                    ('FONTSIZE', (0, 0), (-1, -1), 9),
+                    ('PADDING', (0, 0), (-1, -1), 4),
+                ]))
+                story.append(Spacer(1, 12))
+                story.append(t)
+
+        if not story:
+            story.append(Paragraph("(Empty document)", styles['Normal']))
+
+        pdf.build(story)
+        self.report_progress(100, "Done")
+        return True
 
     def _extract_doc_content(self, input_path):
         """Extract paragraphs and tables from DOCX."""

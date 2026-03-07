@@ -287,17 +287,18 @@ class SimpleConverter:
 
     def _switch_to_advanced(self):
         """Launch Advanced UI and close this one."""
+        kw = {'creationflags': 0x08000000} if os.name == 'nt' else {}
         if getattr(sys, 'frozen', False):
             exe_dir = Path(sys.executable).parent
             adv_exe = exe_dir.parent / "Advanced" / "File Converter Pro.exe"
             if adv_exe.exists():
-                subprocess.Popen([str(adv_exe)], cwd=str(adv_exe.parent))
+                subprocess.Popen([str(adv_exe)], cwd=str(adv_exe.parent), **kw)
                 self.root.destroy()
                 return
         python = sys.executable
         script = Path(__file__).parent / "app.py"
         if script.exists():
-            subprocess.Popen([python, str(script)], cwd=str(script.parent))
+            subprocess.Popen([python, str(script)], cwd=str(script.parent), **kw)
             self.root.destroy()
 
     # --- Batch mode ---

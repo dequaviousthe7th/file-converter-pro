@@ -10,6 +10,8 @@ import re
 from pathlib import Path
 from backend.converters.base_converter import BaseConverter, ConversionError
 
+_NW = {'creationflags': 0x08000000} if os.name == 'nt' else {}
+
 
 class VideoConverter(BaseConverter):
     """Convert between video formats using ffmpeg"""
@@ -54,7 +56,7 @@ class VideoConverter(BaseConverter):
             result = subprocess.run(
                 ['ffprobe', '-v', 'quiet', '-show_entries', 'format=duration',
                  '-of', 'default=noprint_wrappers=1:nokey=1', input_path],
-                capture_output=True, text=True, timeout=10
+                capture_output=True, text=True, timeout=10, **_NW
             )
             return float(result.stdout.strip())
         except Exception:
@@ -76,7 +78,7 @@ class VideoConverter(BaseConverter):
 
         process = subprocess.Popen(
             cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE,
-            universal_newlines=True
+            universal_newlines=True, **_NW
         )
 
         # Parse ffmpeg progress output
@@ -114,7 +116,7 @@ class VideoConverter(BaseConverter):
                 '-vf', 'fps=10,scale=480:-1:flags=lanczos,palettegen',
                 palette_path
             ]
-            result = subprocess.run(cmd_palette, capture_output=True, text=True, timeout=120)
+            result = subprocess.run(cmd_palette, capture_output=True, text=True, timeout=120, **_NW)
             if result.returncode != 0:
                 raise ConversionError("Failed to generate GIF palette")
 
@@ -127,7 +129,7 @@ class VideoConverter(BaseConverter):
                 '-lavfi', 'fps=10,scale=480:-1:flags=lanczos[x];[x][1:v]paletteuse',
                 output_path
             ]
-            result = subprocess.run(cmd_gif, capture_output=True, text=True, timeout=300)
+            result = subprocess.run(cmd_gif, capture_output=True, text=True, timeout=300, **_NW)
             if result.returncode != 0:
                 raise ConversionError("Failed to create GIF")
 
