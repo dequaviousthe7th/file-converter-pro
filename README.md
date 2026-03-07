@@ -107,23 +107,34 @@ Ships with two UI modes:
 
 ## Quick Start
 
-### Windows
+### Installation Wizard (Recommended)
 
-**Advanced UI** — double-click `START.bat`
+The easiest way to get started. No coding knowledge required.
 
-**Simple UI** — double-click `START_SIMPLE.bat`
+**Windows** — double-click `INSTALL.bat`
 
-### macOS / Linux
+**macOS / Linux** — run `./install.sh` in terminal
+
+The wizard will:
+1. Set up a Python virtual environment
+2. Install all required packages
+3. Let you choose your preferred UI
+4. Create a desktop shortcut
+5. Launch the app
+
+### Manual Setup
+
+If you prefer to set things up yourself:
 
 ```bash
 # Create virtual environment
 python3 -m venv venv
-source venv/bin/activate
+source venv/bin/activate  # Windows: venv\Scripts\activate
 
 # Install dependencies
 pip install -r requirements.txt
 
-# Generate app logo (one-time)
+# Generate app logo
 python assets/generate_logo.py
 
 # Run Advanced UI
@@ -163,6 +174,9 @@ Some conversions require external tools:
 
 ```
 File-Converter/
+├── install.py                 # Installation wizard
+├── INSTALL.bat                # Windows installer launcher
+├── install.sh                 # macOS/Linux installer launcher
 ├── app.py                     # Advanced UI
 ├── app_simple.py              # Simple UI
 ├── config.py                  # Format registry & app config
@@ -171,6 +185,8 @@ File-Converter/
 ├── START_SIMPLE.bat           # Windows launcher (Simple)
 ├── assets/
 │   ├── generate_logo.py       # Logo generator script
+│   ├── Advanced-UI.png        # Advanced UI preview
+│   ├── Simple-UI.png          # Simple UI preview
 │   ├── logo.ico               # App icon (generated)
 │   └── logo.png               # Logo image (generated)
 ├── backend/
