@@ -1,0 +1,25 @@
+FILE CONVERTER PRO v2.0.0
+=========================
+
+Convert anything. Fast. Private. No uploads, no cloud, no limits.
+
+WHAT'S INCLUDED:
+  - 200+ conversion paths across 55+ file formats
+  - Documents: PDF, DOCX, TXT, Markdown, HTML, RTF, EPUB
+  - Images: PNG, JPG, WEBP, BMP, TIFF, ICO, SVG, HEIC, GIF
+  - Audio: MP3, WAV, FLAC, OGG, AAC, M4A, WMA
+  - Video: MP4, AVI, MKV, MOV, WebM, GIF
+  - Data: CSV, XLSX, JSON, TSV, YAML, TOML
+
+REQUIREMENTS:
+  - Python 3.8 or higher (must be installed and in PATH)
+  - ffmpeg (optional, for audio/video conversion)
+  - Pandoc (optional, for advanced document conversion)
+
+WHAT THIS INSTALLER DOES:
+  1. Copies application files to your chosen directory
+  2. Creates a Python virtual environment
+  3. Installs all required Python packages
+  4. Creates desktop and Start Menu shortcuts
+
+Everything runs 100% locally on your machine. No files are ever uploaded.
