@@ -26,6 +26,7 @@ UninstallDisplayIcon={app}\assets\logo.ico
 Compression=lzma2/ultra64
 SolidCompression=yes
 WizardStyle=modern
+WizardSizePercent=100,110
 PrivilegesRequired=lowest
 DisableWelcomePage=no
 VersionInfoVersion=2.0.0.0
