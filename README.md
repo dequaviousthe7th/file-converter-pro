@@ -177,8 +177,9 @@ File-Converter/
 ├── START_SIMPLE.bat           # Windows launcher (Simple)
 ├── installer/
 │   ├── setup.iss              # Inno Setup installer script
-│   ├── build.bat              # Build the installer
-│   ├── post_install.bat       # Post-install setup
+│   ├── build.bat              # Windows build script
+│   ├── build_mac.sh           # macOS build script
+│   ├── build_linux.sh         # Linux build script
 │   └── info_before.txt        # Installer info page
 ├── assets/
 │   ├── Advanced-UI.png        # Advanced UI preview

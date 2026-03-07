@@ -3,31 +3,18 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
 *.egg
-MANIFEST
+*.egg-info/
 
 # Virtual environments
 venv/
 .venv/
 env/
-ENV/
-env.bak/
-venv.bak/
+
+# Build outputs
+build/
+dist/
+*.spec
 
 # IDE
 .vscode/
@@ -35,8 +22,11 @@ venv.bak/
 *.swp
 *.swo
 *~
+
+# OS
 .DS_Store
 Thumbs.db
+desktop.ini
 
 # Application output
 converted/*
@@ -45,20 +35,10 @@ converted/*
 # Logs
 *.log
 
-# Build / Packaging
-*.spec
-PyInstaller/
-
-# Testing
-coverage/
-.coverage
-htmlcov/
-
-# Plans (local only)
-PPlan/
-
-# Screenshots
-screenshot_*.png
-
-# App data (user-specific)
+# App data (user-specific settings/history)
 .file-converter-pro/
+
+# Old directories (should not exist)
+bats/
+PPlan/
+coverage/
