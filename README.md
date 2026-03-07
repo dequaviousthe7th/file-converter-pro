@@ -19,6 +19,10 @@
   <img src="https://img.shields.io/badge/Formats-55+-00d4aa.svg" alt="55+ Formats"/>
 </p>
 
+<p align="center">
+  <img src="assets/Advanced-UI.png" alt="Advanced UI" width="800"/>
+</p>
+
 ---
 
 ## Overview
@@ -37,6 +41,10 @@ Ships with two UI modes:
 | **Settings** | - | Output folder, quality, bitrate |
 | **Drag & Drop** | Yes | Yes |
 | **Kill Button** | Yes | Yes |
+
+<p align="center">
+  <img src="assets/Simple-UI.png" alt="Simple UI" width="400"/>
+</p>
 
 ---
 
