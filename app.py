@@ -25,6 +25,7 @@ from backend.history import ConversionHistory
 from backend.settings import Settings
 from utils.platform_utils import open_folder, open_file
 from utils.file_utils import get_file_size_str
+import subprocess
 
 try:
     from tkinterdnd2 import TkinterDnD, DND_FILES
@@ -270,6 +271,15 @@ class FileConverterPro(ctk.CTk):
                                           text_color=T['text_dim'])
         self.status_label.pack(side="left", padx=20)
 
+        # Switch UI button
+        switch_btn = ctk.CTkButton(bar, text="Switch to Simple UI",
+                                    font=ctk.CTkFont(size=10),
+                                    fg_color=T['bg_surface'], hover_color=T['bg_elevated'],
+                                    text_color=T['text_sec'], corner_radius=4,
+                                    height=22, width=120,
+                                    command=self._switch_to_simple)
+        switch_btn.pack(side="left", padx=(10, 0))
+
         # Spacer before credit
         ctk.CTkFrame(bar, fg_color="transparent", width=20).pack(side="right")
 
@@ -290,6 +300,23 @@ class FileConverterPro(ctk.CTk):
                      text_color=T['text_dim']).pack(side="right", padx=(0, 10))
 
     # ── Tab Navigation ────────────────────────────────────
+
+    def _switch_to_simple(self):
+        """Launch Simple UI and close this one."""
+        if getattr(sys, 'frozen', False):
+            # Running as compiled exe
+            exe_dir = Path(sys.executable).parent
+            simple_exe = exe_dir.parent / "Simple" / "File Converter Pro Simple.exe"
+            if simple_exe.exists():
+                subprocess.Popen([str(simple_exe)], cwd=str(simple_exe.parent))
+                self.destroy()
+                return
+        # Running as Python script
+        python = sys.executable
+        script = Path(__file__).parent / "app_simple.py"
+        if script.exists():
+            subprocess.Popen([python, str(script)], cwd=str(script.parent))
+            self.destroy()
 
     def _show_tab(self, tab_id):
         self.current_tab = tab_id

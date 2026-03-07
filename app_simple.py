@@ -21,6 +21,7 @@ from backend.converters.base_converter import ConversionError
 from backend.batch_converter import BatchConverter, BatchItem
 from utils.platform_utils import open_folder
 from utils.file_utils import get_file_size_str
+import subprocess
 
 # Try to import drag-and-drop support
 try:
@@ -185,8 +186,17 @@ class SimpleConverter:
         header_right = ttk.Frame(header)
         header_right.pack(side="right")
 
+        switch_btn = tk.Button(header_right, text="Switch to Advanced UI",
+                               font=("Segoe UI", 7), fg="#666666", bg="#e8e8e8",
+                               activebackground="#d0d0d0", activeforeground="#333333",
+                               relief="flat", cursor="hand2", bd=0,
+                               command=self._switch_to_advanced)
+        switch_btn.pack(anchor="ne", pady=(8, 0))
+        switch_btn.bind("<Enter>", lambda e: switch_btn.configure(fg="#333333", bg="#d8d8d8"))
+        switch_btn.bind("<Leave>", lambda e: switch_btn.configure(fg="#666666", bg="#e8e8e8"))
+
         ttk.Label(header_right, text=f"Version: {VERSION}", font=("Segoe UI", 8),
-                  foreground="gray").pack(anchor="ne", pady=(32, 0))
+                  foreground="gray").pack(anchor="ne", pady=(4, 0))
 
         title_frame = ttk.Frame(logo_title_row)
         title_frame.pack(side="left")
@@ -274,6 +284,21 @@ class SimpleConverter:
 
         # Output folder
         ttk.Button(main, text="Open Output Folder", command=self.open_output_folder).pack(fill="x")
+
+    def _switch_to_advanced(self):
+        """Launch Advanced UI and close this one."""
+        if getattr(sys, 'frozen', False):
+            exe_dir = Path(sys.executable).parent
+            adv_exe = exe_dir.parent / "Advanced" / "File Converter Pro.exe"
+            if adv_exe.exists():
+                subprocess.Popen([str(adv_exe)], cwd=str(adv_exe.parent))
+                self.root.destroy()
+                return
+        python = sys.executable
+        script = Path(__file__).parent / "app.py"
+        if script.exists():
+            subprocess.Popen([python, str(script)], cwd=str(script.parent))
+            self.root.destroy()
 
     # --- Batch mode ---
 
