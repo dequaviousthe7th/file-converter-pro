@@ -3,7 +3,6 @@ Data/Spreadsheet Converter Module
 Handles conversions between CSV, XLSX, JSON, TSV, and HTML table formats.
 """
 
-import os
 import json
 from pathlib import Path
 from backend.converters.base_converter import BaseConverter, ConversionError

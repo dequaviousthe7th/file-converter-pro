@@ -4,7 +4,6 @@ Handles OS-specific operations like opening folders and finding fonts.
 """
 
 import os
-import sys
 import subprocess
 import platform
 
@@ -81,18 +80,6 @@ def check_ffmpeg():
     try:
         result = subprocess.run(
             ["ffmpeg", "-version"],
-            capture_output=True, text=True, timeout=5
-        )
-        return result.returncode == 0
-    except (FileNotFoundError, subprocess.TimeoutExpired):
-        return False
-
-
-def check_libreoffice():
-    """Check if LibreOffice is installed and accessible."""
-    try:
-        result = subprocess.run(
-            ["libreoffice", "--version"],
             capture_output=True, text=True, timeout=5
         )
         return result.returncode == 0

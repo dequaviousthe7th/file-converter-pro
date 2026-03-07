@@ -4,7 +4,6 @@ Handles conversions between audio formats using pydub (ffmpeg wrapper).
 Requires ffmpeg to be installed on the system.
 """
 
-import os
 from pathlib import Path
 from backend.converters.base_converter import BaseConverter, ConversionError
 
