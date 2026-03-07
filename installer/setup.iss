@@ -26,7 +26,7 @@ UninstallDisplayIcon={app}\assets\logo.ico
 Compression=lzma2/ultra64
 SolidCompression=yes
 WizardStyle=modern
-WizardSizePercent=100,110
+WizardSizePercent=100,130
 PrivilegesRequired=lowest
 DisableWelcomePage=no
 VersionInfoVersion=2.0.0.0
@@ -161,7 +161,7 @@ begin
   TitleLabel.Caption := 'File Converter Pro ships with two UI modes:';
   TitleLabel.Font.Size := 10;
   TitleLabel.Left := 0;
-  TitleLabel.Top := 8;
+  TitleLabel.Top := 4;
   TitleLabel.Width := UIPage.SurfaceWidth;
 
   // === Advanced UI ===
@@ -171,16 +171,16 @@ begin
   AdvancedButton.Font.Size := 10;
   AdvancedButton.Font.Style := [fsBold];
   AdvancedButton.Left := 0;
-  AdvancedButton.Top := 48;
+  AdvancedButton.Top := 36;
   AdvancedButton.Width := UIPage.SurfaceWidth;
-  AdvancedButton.Height := 24;
+  AdvancedButton.Height := 22;
   AdvancedButton.Checked := True;
 
   AdvancedDesc := TNewStaticText.Create(UIPage);
   AdvancedDesc.Parent := UIPage.Surface;
   AdvancedDesc.Caption := 'Best for power users and batch workflows.';
   AdvancedDesc.Left := 20;
-  AdvancedDesc.Top := 74;
+  AdvancedDesc.Top := 60;
   AdvancedDesc.Width := UIPage.SurfaceWidth - 20;
   AdvancedDesc.Font.Color := clGray;
 
@@ -193,15 +193,15 @@ begin
     '    - Configurable output folder, image quality, audio bitrate' + #13#10 +
     '    - Drag and drop support';
   AdvancedFeatures.Left := 20;
-  AdvancedFeatures.Top := 94;
+  AdvancedFeatures.Top := 78;
   AdvancedFeatures.Width := UIPage.SurfaceWidth - 20;
-  AdvancedFeatures.Height := 80;
+  AdvancedFeatures.Height := 76;
   AdvancedFeatures.Font.Color := clGray;
 
   Separator1 := TBevel.Create(UIPage);
   Separator1.Parent := UIPage.Surface;
   Separator1.Left := 0;
-  Separator1.Top := 182;
+  Separator1.Top := 160;
   Separator1.Width := UIPage.SurfaceWidth;
   Separator1.Height := 2;
   Separator1.Shape := bsTopLine;
@@ -213,16 +213,16 @@ begin
   SimpleButton.Font.Size := 10;
   SimpleButton.Font.Style := [fsBold];
   SimpleButton.Left := 0;
-  SimpleButton.Top := 196;
+  SimpleButton.Top := 170;
   SimpleButton.Width := UIPage.SurfaceWidth;
-  SimpleButton.Height := 24;
+  SimpleButton.Height := 22;
   SimpleButton.Checked := False;
 
   SimpleDesc := TNewStaticText.Create(UIPage);
   SimpleDesc.Parent := UIPage.Surface;
   SimpleDesc.Caption := 'Best for quick single-file conversions.';
   SimpleDesc.Left := 20;
-  SimpleDesc.Top := 222;
+  SimpleDesc.Top := 194;
   SimpleDesc.Width := UIPage.SurfaceWidth - 20;
   SimpleDesc.Font.Color := clGray;
 
@@ -234,15 +234,15 @@ begin
     '    - Drag and drop support' + #13#10 +
     '    - Kill button to cancel any conversion';
   SimpleFeatures.Left := 20;
-  SimpleFeatures.Top := 242;
+  SimpleFeatures.Top := 212;
   SimpleFeatures.Width := UIPage.SurfaceWidth - 20;
-  SimpleFeatures.Height := 65;
+  SimpleFeatures.Height := 64;
   SimpleFeatures.Font.Color := clGray;
 
   Separator2 := TBevel.Create(UIPage);
   Separator2.Parent := UIPage.Surface;
   Separator2.Left := 0;
-  Separator2.Top := 316;
+  Separator2.Top := 284;
   Separator2.Width := UIPage.SurfaceWidth;
   Separator2.Height := 2;
   Separator2.Shape := bsTopLine;
@@ -251,8 +251,11 @@ begin
   NoteLabel.Parent := UIPage.Surface;
   NoteLabel.Caption := 'Both UIs are always installed. You can switch anytime via Start Menu shortcuts or the built-in switch button.';
   NoteLabel.Left := 0;
-  NoteLabel.Top := 330;
+  NoteLabel.Top := 294;
   NoteLabel.Width := UIPage.SurfaceWidth;
+  NoteLabel.AutoSize := False;
+  NoteLabel.Height := 30;
+  NoteLabel.WordWrap := True;
   NoteLabel.Font.Style := [fsItalic];
   NoteLabel.Font.Color := clGray;
 end;
