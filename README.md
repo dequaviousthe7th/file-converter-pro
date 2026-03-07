@@ -1,9 +1,5 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python"/>
-  <img src="https://img.shields.io/badge/CustomTkinter-1c1c24?style=for-the-badge&logo=python&logoColor=00d4aa" alt="CustomTkinter"/>
-  <img src="https://img.shields.io/badge/Tkinter-f0f0f0?style=for-the-badge&logo=python&logoColor=333333" alt="Tkinter"/>
-  <img src="https://img.shields.io/badge/FFmpeg-007808?style=for-the-badge&logo=ffmpeg&logoColor=white" alt="FFmpeg"/>
-  <img src="https://img.shields.io/badge/Pillow-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Pillow"/>
+  <img src="assets/logo.png" alt="File Converter Pro" width="120"/>
 </p>
 
 <h1 align="center">File Converter Pro</h1>
@@ -13,9 +9,13 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/dequaviousthe7th/File-Converter/releases"><img src="https://img.shields.io/badge/Download-FCP--Setup.exe-00d4aa?style=for-the-badge&logo=windows&logoColor=white" alt="Download"/></a>
+</p>
+
+<p align="center">
   <img src="https://img.shields.io/badge/Version-2.0.0-00d4aa.svg" alt="Version 2.0.0"/>
   <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT"/>
-  <img src="https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg" alt="Platform"/>
+  <img src="https://img.shields.io/badge/Platform-Windows-lightgrey.svg" alt="Platform"/>
   <img src="https://img.shields.io/badge/Formats-55+-00d4aa.svg" alt="55+ Formats"/>
 </p>
 
@@ -31,20 +31,66 @@
 
 ---
 
+## Installation
+
+### Download (Recommended)
+
+> **No coding or technical knowledge required.**
+
+1. Go to the **[Releases](https://github.com/dequaviousthe7th/File-Converter/releases)** page
+2. Download **`FCP-Setup.exe`**
+3. Run the installer and follow the setup wizard
+4. Launch the app from your desktop or Start Menu
+
+That's it. The installer handles everything:
+
+- Installs the full application as a standalone program
+- Lets you choose between **Advanced UI** or **Simple UI** as your default
+- Optionally installs **ffmpeg** (audio/video) and **Pandoc** (documents) for you
+- Creates desktop and Start Menu shortcuts
+- Registers in Add/Remove Programs for easy uninstallation
+- Both UIs are always installed — switch between them anytime with the built-in switch button
+
+### Manual Installation (Developers)
+
+<details>
+<summary>Click to expand</summary>
+
+If you prefer to run from source:
+
+1. Clone the repository
+2. Make sure Python 3.8+ is installed
+3. Create a virtual environment and install dependencies:
+   ```bash
+   python -m venv venv
+   venv\Scripts\activate        # Windows
+   pip install -r requirements.txt
+   ```
+4. Run your preferred UI:
+   ```bash
+   python app.py               # Advanced UI
+   python app_simple.py        # Simple UI
+   ```
+
+Or on Windows, double-click `START.bat` (Advanced) or `START_SIMPLE.bat` (Simple).
+
+</details>
+
+---
+
 ## Overview
 
-**File Converter Pro** is a desktop file conversion tool with 200+ conversion paths across documents, images, audio, video, spreadsheets, and config files. Everything runs locally on your machine — no files are uploaded anywhere.
+**File Converter Pro** is a desktop file conversion tool with **200+ conversion paths** across documents, images, audio, video, spreadsheets, and config files. Everything runs **100% locally** on your machine — no files are uploaded anywhere.
 
-Ships with two UI modes:
+Ships with two UI modes you can switch between at any time:
 
 | | Simple UI | Advanced UI |
 |--|-----------|-------------|
 | **Style** | Classic, lightweight | Modern dark studio theme |
-| **Framework** | Standard Tkinter | CustomTkinter |
 | **Best For** | Quick single conversions | Power users, batch workflows |
 | **Batch Mode** | Checkbox toggle | Dedicated page |
-| **History** | - | Full conversion history |
-| **Settings** | - | Output folder, quality, bitrate |
+| **History** | — | Full conversion history |
+| **Settings** | — | Output folder, quality, bitrate |
 | **Drag & Drop** | Yes | Yes |
 | **Kill Button** | Yes | Yes |
 
@@ -105,43 +151,17 @@ Ships with two UI modes:
 
 ---
 
-## Quick Start
-
-### Installation
-
-Download and run **File Converter Pro Setup.exe**. The setup wizard will:
-
-1. Set up everything automatically
-2. Let you choose your preferred UI
-3. Install all required packages
-4. Create a desktop shortcut
-5. Launch the app
-
-No coding knowledge required.
-
-### System Dependencies
-
-Some conversions require external tools:
-
-| Tool | Required For | Install |
-|------|-------------|---------|
-| **ffmpeg** | Audio & video conversion | [ffmpeg.org/download](https://ffmpeg.org/download.html) |
-| **Pandoc** | Document conversion fallback | [pandoc.org](https://pandoc.org/) |
-
----
-
 ## Features
 
 - **200+ Conversion Paths** across 55+ file formats
-- **Dual UI Modes** — Classic simple or modern dark theme
+- **Dual UI Modes** — Switch between classic simple and modern dark theme anytime
 - **Batch Conversion** — Convert multiple files in a single queue
 - **Drag & Drop** — Drop files directly onto the window
 - **Kill Button** — Cancel any conversion instantly
 - **Real Progress** — Live progress reporting with status messages
 - **Conversion History** — Track all past conversions (Advanced UI)
 - **Configurable Settings** — Output folder, image quality, audio bitrate
-- **Cross-Platform** — Windows, macOS, and Linux
-- **100% Local** — No internet required, no files uploaded
+- **100% Local** — No internet required, no files uploaded anywhere
 
 ---
 
@@ -149,20 +169,22 @@ Some conversions require external tools:
 
 ```
 File-Converter/
-├── install.py                 # Installation wizard
-├── build_installer.py         # Builds Setup.exe
 ├── app.py                     # Advanced UI
 ├── app_simple.py              # Simple UI
 ├── config.py                  # Format registry & app config
 ├── requirements.txt           # Python dependencies
 ├── START.bat                  # Windows launcher (Advanced)
 ├── START_SIMPLE.bat           # Windows launcher (Simple)
+├── installer/
+│   ├── setup.iss              # Inno Setup installer script
+│   ├── build.bat              # Build the installer
+│   ├── post_install.bat       # Post-install setup
+│   └── info_before.txt        # Installer info page
 ├── assets/
-│   ├── generate_logo.py       # Logo generator script
 │   ├── Advanced-UI.png        # Advanced UI preview
 │   ├── Simple-UI.png          # Simple UI preview
-│   ├── logo.ico               # App icon (generated)
-│   └── logo.png               # Logo image (generated)
+│   ├── logo.ico               # App icon
+│   └── logo.png               # Logo image
 ├── backend/
 │   ├── converter_registry.py  # Extension -> converter mapping
 │   ├── batch_converter.py     # Batch conversion engine
@@ -184,33 +206,8 @@ File-Converter/
 ├── utils/
 │   ├── platform_utils.py      # Cross-platform helpers
 │   └── file_utils.py          # File validation & temp files
-├── converted/                 # Default output directory
-└── bats/                      # Windows utility scripts
+└── converted/                 # Default output directory
 ```
-
----
-
-## Dependencies
-
-| Package | Purpose |
-|---------|---------|
-| **customtkinter** | Modern dark UI framework (Advanced UI) |
-| **Pillow** | Image processing & conversion |
-| **pdf2docx** | PDF to Word conversion |
-| **pypdf** | PDF reading & text extraction |
-| **reportlab** | PDF generation |
-| **python-docx** | Word document handling |
-| **pydub** | Audio conversion (ffmpeg wrapper) |
-| **ffmpeg-python** | Video conversion (ffmpeg wrapper) |
-| **pandas** | Data format conversion |
-| **openpyxl** | Excel file handling |
-| **pyyaml** | YAML support |
-| **toml** | TOML support |
-| **cairosvg** | SVG rasterization |
-| **pillow-heif** | HEIC/HEIF image support |
-| **ebooklib** | EPUB reading |
-| **beautifulsoup4** | HTML parsing |
-| **tkinterdnd2** | Native drag & drop |
 
 ---
 
@@ -226,7 +223,7 @@ File-Converter/
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) for details.
+MIT License — see [LICENSE](LICENSE) for details.
 
 ---
 
