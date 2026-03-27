@@ -165,53 +165,6 @@ Ships with two UI modes you can switch between at any time:
 
 ---
 
-## Project Structure
-
-```
-File-Converter/
-├── app.py                     # Advanced UI
-├── app_simple.py              # Simple UI
-├── config.py                  # Format registry & app config
-├── requirements.txt           # Python dependencies
-├── START.bat                  # Windows launcher (Advanced)
-├── START_SIMPLE.bat           # Windows launcher (Simple)
-├── installer/
-│   ├── setup.iss              # Inno Setup installer script
-│   ├── build.bat              # Windows build script
-│   ├── build_mac.sh           # macOS build script
-│   ├── build_linux.sh         # Linux build script
-│   └── info_before.txt        # Installer info page
-├── assets/
-│   ├── Advanced-UI.png        # Advanced UI preview
-│   ├── Simple-UI.png          # Simple UI preview
-│   ├── logo.ico               # App icon
-│   └── logo.png               # Logo image
-├── backend/
-│   ├── converter_registry.py  # Extension -> converter mapping
-│   ├── batch_converter.py     # Batch conversion engine
-│   ├── history.py             # Conversion history
-│   ├── settings.py            # Persistent settings
-│   └── converters/
-│       ├── base_converter.py  # Base class with cancel/progress
-│       ├── pdf_converter.py
-│       ├── word_converter.py
-│       ├── markdown_converter.py
-│       ├── image_converter.py # PNG, JPG, WEBP, TIFF, ICO, SVG, HEIC, GIF
-│       ├── text_converter.py
-│       ├── audio_converter.py # MP3, WAV, FLAC, OGG, AAC, M4A, WMA
-│       ├── video_converter.py # MP4, AVI, MKV, MOV, WebM, GIF
-│       ├── data_converter.py  # CSV, XLSX, JSON, TSV
-│       ├── code_converter.py  # JSON, YAML, TOML
-│       ├── html_converter.py
-│       └── ebook_converter.py # EPUB, RTF
-├── utils/
-│   ├── platform_utils.py      # Cross-platform helpers
-│   └── file_utils.py          # File validation & temp files
-└── converted/                 # Default output directory
-```
-
----
-
 ## Contributing
 
 1. Fork the repository
