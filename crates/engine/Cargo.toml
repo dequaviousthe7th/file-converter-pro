@@ -1,0 +1,33 @@
+[package]
+name = "fcp-engine"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lib]
+name = "fcp_engine"
+path = "src/lib.rs"
+
+[dependencies]
+image = "0.25"
+fast_image_resize = "6"
+webp = "0.3"
+ico-builder = "0.2"
+resvg = "0.47"
+svg2pdf = "0.13"
+printpdf = "=0.12.4"
+pdfium-render = "0.9"
+pdf-extract = "0.12"
+csv = "1.4"
+calamine = "0.36"
+rust_xlsxwriter = "0.96"
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["preserve_order"] }
+serde-saphyr = "0.0.29"
+toml = "1"
+thiserror = "2"
+tempfile = "3"
+kamadak-exif = "0.6"
+
+[dev-dependencies]
+tempfile = "3"

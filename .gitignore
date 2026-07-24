@@ -42,3 +42,20 @@ converted/*
 bats/
 PPlan/
 coverage/
+
+# Node / frontend
+node_modules/
+dist-web/
+
+# Rust
+target/
+
+# Tauri (sidecars and pdfium are fetched by script, never committed)
+src-tauri/binaries/*
+!src-tauri/binaries/.gitkeep
+src-tauri/resources/pdfium*
+src-tauri/gen/
+
+# Legacy / local output
+converted/
+graphify-out/
