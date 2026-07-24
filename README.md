@@ -16,7 +16,7 @@
   <img src="https://img.shields.io/badge/Version-3.0.0-00d4aa.svg" alt="Version 3.0.0"/>
   <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT"/>
   <img src="https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg" alt="Platform"/>
-  <img src="https://img.shields.io/badge/Conversion%20Paths-178%2B-00d4aa.svg" alt="178+ Conversion Paths"/>
+  <img src="https://img.shields.io/badge/Conversion%20Paths-158-00d4aa.svg" alt="158 Conversion Paths"/>
 </p>
 
 ---
@@ -43,7 +43,7 @@ Everything is bundled — no separate ffmpeg or Pandoc installs, ever.
 
 ## Overview
 
-File Converter Pro is a standalone desktop app that converts documents, images, audio, video, spreadsheets, and config files — **178+ conversion paths**, all processed locally. Version 3 is a ground-up rebuild: a Rust conversion engine inside a Tauri 2 shell, with a single premium dark UI (the old Advanced/Simple split is gone).
+File Converter Pro is a standalone desktop app that converts documents, images, audio, video, spreadsheets, and config files — **158 conversion paths**, all processed locally. Version 3 is a ground-up rebuild: a Rust conversion engine inside a Tauri 2 shell, with a single premium dark UI (the old Advanced/Simple split is gone).
 
 <!-- SCREENSHOT: convert view -->
 
