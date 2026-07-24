@@ -1,0 +1,103 @@
+# CI — lint, test, and type-check every push and pull request.
+#
+# Three independent jobs:
+#   test-engine — fmt + clippy + full fcp-engine test suite (ffmpeg/pandoc installed
+#                 so the sidecar-gated tests actually run instead of skipping).
+#   frontend    — npm ci + production build (tsc + vite).
+#   check-tauri — cargo check of the whole workspace on ubuntu-22.04 with the
+#                 WebKitGTK stack, so src-tauri compile breakage is caught without
+#                 a full bundle build.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test-engine:
+    name: Engine tests (fmt, clippy, cargo test)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Check formatting
+        run: cargo fmt --all --check
+
+      - name: Clippy (deny warnings)
+        run: cargo clippy -p fcp-engine -- -D warnings
+
+      - name: Install conversion tools for gated tests
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg pandoc
+
+      - name: Run engine tests
+        run: cargo test -p fcp-engine
+
+  frontend:
+    name: Frontend build (tsc + vite)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+  check-tauri:
+    name: Tauri shell check (workspace)
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Tauri system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            libxdo-dev \
+            patchelf
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+
+      # tauri-build / generate_context! expect the frontend dist, the sidecar
+      # binaries, and the resources dir to exist even for a plain cargo check.
+      # Stub them so this job never downloads sidecars or builds the frontend.
+      - name: Stub frontend dist, sidecars, and resources
+        run: |
+          mkdir -p dist-web src-tauri/binaries src-tauri/resources
+          [ -f dist-web/index.html ] || printf '<!doctype html><title>stub</title>\n' > dist-web/index.html
+          [ -e src-tauri/resources/PLACEHOLDER ] || touch src-tauri/resources/PLACEHOLDER
+          for bin in ffmpeg pandoc typst; do
+            f="src-tauri/binaries/${bin}-x86_64-unknown-linux-gnu"
+            if [ ! -f "$f" ]; then
+              printf '#!/bin/sh\nexit 0\n' > "$f"
+              chmod +x "$f"
+            fi
+          done
+
+      - name: Check workspace
+        run: cargo check --workspace --all-targets

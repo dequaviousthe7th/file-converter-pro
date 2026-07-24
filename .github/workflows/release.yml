@@ -1,0 +1,243 @@
+# Release — build, bundle, and (when credentials are configured) sign
+# File Converter Pro for all four targets, publishing everything to a DRAFT
+# GitHub Release. Publishing the draft is always a manual step.
+#
+# Signing is fully optional at every layer: if a secret/var is absent the
+# corresponding signing step is skipped and the build still succeeds unsigned.
+#   macOS   — Tauri signs + notarizes automatically when APPLE_* env vars exist.
+#   Windows — SignPath two-step (submit → replace release asset) runs only when
+#             the SIGNPATH_ORGANIZATION_ID repository VARIABLE is set.
+#   Linux   — SHA256SUMS always; GPG signature only when GPG_PRIVATE_KEY exists.
+#   Updater — TAURI_SIGNING_PRIVATE_KEY(_PASSWORD) passed through when present.
+
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build ${{ matrix.target }}
+    runs-on: ${{ matrix.platform }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: macos-latest
+            target: aarch64-apple-darwin
+          - platform: macos-latest
+            target: x86_64-apple-darwin
+          - platform: ubuntu-22.04
+            target: x86_64-unknown-linux-gnu
+          - platform: windows-latest
+            target: x86_64-pc-windows-msvc
+    env:
+      # Secrets are not allowed in step-level `if:` on all context surfaces;
+      # surface presence flags here instead. The values never leave the job.
+      HAS_GPG: ${{ secrets.GPG_PRIVATE_KEY != '' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: ${{ matrix.target }}
+
+      - name: Install Tauri system dependencies (Linux)
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            libxdo-dev \
+            patchelf
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Fetch sidecar binaries (Unix)
+        if: matrix.platform != 'windows-latest'
+        shell: bash
+        run: bash scripts/fetch-sidecars.sh "$TRIPLE"
+        env:
+          TRIPLE: ${{ matrix.target }}
+
+      - name: Fetch sidecar binaries (Windows)
+        if: matrix.platform == 'windows-latest'
+        shell: pwsh
+        run: ./scripts/fetch-sidecars.ps1 "$env:TRIPLE"
+        env:
+          TRIPLE: ${{ matrix.target }}
+
+      # Export signing-related env vars ONLY when the backing secret is
+      # non-empty. Tauri (and tauri-action) key off the *presence* of these
+      # variables, so exporting empty strings could break unsigned builds.
+      # With no signing secrets configured this step exports nothing and the
+      # build proceeds unsigned.
+      - name: Export signing environment (skips anything unset)
+        shell: bash
+        env:
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
+          APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+          APPLE_API_KEY_PATH: ${{ secrets.APPLE_API_KEY_PATH }}
+          APPLE_API_KEY_CONTENT: ${{ secrets.APPLE_API_KEY_CONTENT }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        run: |
+          # If the App Store Connect .p8 is stored as secret content rather
+          # than a path, materialise it and point APPLE_API_KEY_PATH at it.
+          if [ -n "$APPLE_API_KEY_CONTENT" ] && [ -z "$APPLE_API_KEY_PATH" ]; then
+            key_path="$RUNNER_TEMP/apple-api-key.p8"
+            printf '%s' "$APPLE_API_KEY_CONTENT" > "$key_path"
+            APPLE_API_KEY_PATH="$key_path"
+          fi
+          for name in APPLE_CERTIFICATE APPLE_CERTIFICATE_PASSWORD APPLE_SIGNING_IDENTITY \
+                      APPLE_ID APPLE_PASSWORD APPLE_TEAM_ID \
+                      APPLE_API_KEY APPLE_API_ISSUER APPLE_API_KEY_PATH \
+                      TAURI_SIGNING_PRIVATE_KEY TAURI_SIGNING_PRIVATE_KEY_PASSWORD; do
+            value="${!name}"
+            if [ -n "$value" ]; then
+              {
+                echo "${name}<<__FCP_EOF__"
+                printf '%s\n' "$value"
+                echo "__FCP_EOF__"
+              } >> "$GITHUB_ENV"
+              echo "enabled: $name"
+            fi
+          done
+
+      - name: Build and upload to draft release
+        id: tauri
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: v__VERSION__
+          releaseName: 'File Converter Pro v__VERSION__'
+          releaseDraft: true
+          prerelease: false
+          args: --target ${{ matrix.target }}
+
+      # ---------------------------------------------------------------------
+      # Windows: SignPath two-step. Runs only when the repository variable
+      # SIGNPATH_ORGANIZATION_ID is set; otherwise the unsigned installer
+      # stays on the draft release.
+      # ---------------------------------------------------------------------
+      - name: Locate NSIS installer (Windows)
+        id: installer
+        if: matrix.platform == 'windows-latest' && vars.SIGNPATH_ORGANIZATION_ID != ''
+        shell: pwsh
+        env:
+          TRIPLE: ${{ matrix.target }}
+        run: |
+          $exe = Get-ChildItem -Path "src-tauri/target/$env:TRIPLE/release/bundle/nsis" -Filter '*-setup.exe' |
+            Select-Object -First 1
+          if (-not $exe) { throw 'No NSIS installer found under the bundle directory' }
+          Add-Content -Path $env:GITHUB_OUTPUT -Value "path=$($exe.FullName)"
+          Add-Content -Path $env:GITHUB_OUTPUT -Value "name=$($exe.Name)"
+
+      - name: Upload unsigned installer for signing
+        id: unsigned
+        if: matrix.platform == 'windows-latest' && vars.SIGNPATH_ORGANIZATION_ID != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: unsigned-installer
+          path: ${{ steps.installer.outputs.path }}
+          if-no-files-found: error
+
+      - name: Submit SignPath signing request
+        if: matrix.platform == 'windows-latest' && vars.SIGNPATH_ORGANIZATION_ID != ''
+        uses: signpath/github-action-submit-signing-request@v1.2
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: file-converter-pro
+          signing-policy-slug: release-signing
+          github-artifact-id: ${{ steps.unsigned.outputs.artifact-id }}
+          wait-for-completion: true
+          # release-signing policies require a manual approval click in the
+          # SignPath UI; give the approver up to 2 hours before failing.
+          wait-for-completion-timeout-in-seconds: '7200'
+          output-artifact-directory: signpath-signed
+
+      - name: Replace release asset with signed installer
+        if: matrix.platform == 'windows-latest' && vars.SIGNPATH_ORGANIZATION_ID != ''
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ASSET_NAME: ${{ steps.installer.outputs.name }}
+          APP_VERSION: ${{ steps.tauri.outputs.appVersion }}
+        run: |
+          $signed = Get-ChildItem -Path 'signpath-signed' -Recurse -Filter $env:ASSET_NAME |
+            Select-Object -First 1
+          if (-not $signed) { throw "Signed installer $env:ASSET_NAME not found in signpath-signed/" }
+          gh release upload "v$env:APP_VERSION" $signed.FullName --clobber --repo $env:GITHUB_REPOSITORY
+
+      # ---------------------------------------------------------------------
+      # Linux: checksums (always) + optional GPG signature of the checksum file.
+      # ---------------------------------------------------------------------
+      - name: Generate SHA256SUMS (Linux)
+        if: matrix.platform == 'ubuntu-22.04'
+        shell: bash
+        env:
+          TRIPLE: ${{ matrix.target }}
+        run: |
+          bundle_dir="src-tauri/target/$TRIPLE/release/bundle"
+          out="$PWD/SHA256SUMS"
+          : > "$out"
+          find "$bundle_dir" -maxdepth 2 -type f \
+            \( -name '*.AppImage' -o -name '*.deb' -o -name '*.rpm' \) -print0 |
+            while IFS= read -r -d '' f; do
+              ( cd "$(dirname "$f")" && sha256sum "$(basename "$f")" ) >> "$out"
+            done
+          echo '--- SHA256SUMS ---'
+          cat "$out"
+          test -s "$out"
+
+      - name: GPG-sign SHA256SUMS (Linux, optional)
+        if: matrix.platform == 'ubuntu-22.04' && env.HAS_GPG == 'true'
+        shell: bash
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        run: |
+          printf '%s\n' "$GPG_PRIVATE_KEY" | gpg --batch --import
+          if [ -n "$GPG_PASSPHRASE" ]; then
+            gpg --batch --yes --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" \
+              --armor --detach-sign SHA256SUMS
+          else
+            gpg --batch --yes --armor --detach-sign SHA256SUMS
+          fi
+
+      - name: Attach checksums to draft release (Linux)
+        if: matrix.platform == 'ubuntu-22.04'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          APP_VERSION: ${{ steps.tauri.outputs.appVersion }}
+        run: |
+          files=(SHA256SUMS)
+          [ -f SHA256SUMS.asc ] && files+=(SHA256SUMS.asc)
+          gh release upload "v$APP_VERSION" "${files[@]}" --clobber --repo "$GITHUB_REPOSITORY"
