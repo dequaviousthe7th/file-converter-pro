@@ -88,9 +88,9 @@ jobs:
       # Stub them so this job never downloads sidecars or builds the frontend.
       - name: Stub frontend dist, sidecars, and resources
         run: |
-          mkdir -p dist-web src-tauri/binaries src-tauri/resources
+          mkdir -p dist-web src-tauri/binaries src-tauri/resources/pdfium
           [ -f dist-web/index.html ] || printf '<!doctype html><title>stub</title>\n' > dist-web/index.html
-          [ -e src-tauri/resources/PLACEHOLDER ] || touch src-tauri/resources/PLACEHOLDER
+          [ -e src-tauri/resources/pdfium/libpdfium.so ] || touch src-tauri/resources/pdfium/libpdfium.so
           for bin in ffmpeg pandoc typst; do
             f="src-tauri/binaries/${bin}-x86_64-unknown-linux-gnu"
             if [ ! -f "$f" ]; then
