@@ -68,6 +68,10 @@ Full terms: [signpath.org/terms.html](https://signpath.org/terms.html)
 4. **Expected wait: days to weeks** for the application review.
 5. On approval you get a SignPath organization with a project and a `release-signing`
    signing policy. Configure the artifact as a `pe-file`.
+   - **Name the SignPath project exactly `file-converter-pro`.** `release.yml` hard-codes
+     `project-slug: file-converter-pro` and `signing-policy-slug: release-signing`; if the
+     project or policy slug differs, the signing request 404s. Either match these names or
+     update the two values in `.github/workflows/release.yml`.
 6. Create an API token in the SignPath UI, then in this GitHub repo add:
    - **Secret** `SIGNPATH_API_TOKEN` — the API token
    - **Variable** `SIGNPATH_ORGANIZATION_ID` — your SignPath organization ID

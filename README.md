@@ -27,13 +27,14 @@ Grab the latest release from the **[Releases](https://github.com/dequaviousthe7t
 
 | OS | Download | Notes |
 |----|----------|-------|
-| **Windows** (10/11, x64) | `File-Converter-Pro_3.0.0_x64-setup.exe` | Per-user install — no admin rights needed |
-| **macOS** (Apple Silicon) | `File Converter Pro_3.0.0_aarch64.dmg` | Signed & notarized by Apple |
-| **macOS** (Intel) | `File Converter Pro_3.0.0_x64.dmg` | Signed & notarized by Apple |
-| **Linux** | `File Converter Pro_3.0.0_amd64.AppImage` | Portable — `chmod +x` and run |
-| **Linux** (Debian/Ubuntu) | `File Converter Pro_3.0.0_amd64.deb` | `sudo dpkg -i` to install |
+| **Windows** (10/11, x64) | the `…-setup.exe` installer | Per-user install — no admin rights needed |
+| **macOS** (Apple Silicon) | the `…_aarch64.dmg` | Signed & notarized by Apple |
+| **macOS** (Intel) | the `…_x64.dmg` | Signed & notarized by Apple |
+| **Linux** | the `.AppImage` | Portable — `chmod +x` and run |
+| **Linux** (Debian/Ubuntu) | the `.deb` | `sudo dpkg -i` to install |
 
-Everything is bundled — no separate ffmpeg or Pandoc installs, ever.
+Each release lists the exact file names on its Releases page. Everything is bundled — no
+separate ffmpeg or Pandoc installs, ever.
 
 ## Trusted & secure
 
