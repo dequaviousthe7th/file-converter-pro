@@ -9,94 +9,49 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/dequaviousthe7th/File-Converter/releases"><img src="https://img.shields.io/badge/Download-FCP--Setup.exe-00d4aa?style=for-the-badge&logo=windows&logoColor=white" alt="Download"/></a>
+  <a href="https://github.com/dequaviousthe7th/File-Converter/releases/latest"><img src="https://img.shields.io/badge/Download-Latest%20Release-00d4aa?style=for-the-badge&logo=github&logoColor=white" alt="Download"/></a>
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Version-2.0.0-00d4aa.svg" alt="Version 2.0.0"/>
+  <img src="https://img.shields.io/badge/Version-3.0.0-00d4aa.svg" alt="Version 3.0.0"/>
   <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT"/>
   <img src="https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg" alt="Platform"/>
-  <img src="https://img.shields.io/badge/Formats-55+-00d4aa.svg" alt="55+ Formats"/>
-</p>
-
-<p align="center"><b>Advanced UI</b></p>
-<p align="center">
-  <img src="assets/Advanced-UI.png" alt="Advanced UI" width="800"/>
-</p>
-
-<p align="center"><b>Simple UI</b></p>
-<p align="center">
-  <img src="assets/Simple-UI.png" alt="Simple UI" width="450"/>
+  <img src="https://img.shields.io/badge/Conversion%20Paths-178%2B-00d4aa.svg" alt="178+ Conversion Paths"/>
 </p>
 
 ---
 
-## Installation
+## Download
 
-### Download (Recommended)
+Grab the latest release from the **[Releases](https://github.com/dequaviousthe7th/File-Converter/releases/latest)** page:
 
-> **No coding or technical knowledge required.**
+| OS | Download | Notes |
+|----|----------|-------|
+| **Windows** (10/11, x64) | `File-Converter-Pro_3.0.0_x64-setup.exe` | Per-user install — no admin rights needed |
+| **macOS** (Apple Silicon) | `File Converter Pro_3.0.0_aarch64.dmg` | Signed & notarized by Apple |
+| **macOS** (Intel) | `File Converter Pro_3.0.0_x64.dmg` | Signed & notarized by Apple |
+| **Linux** | `File Converter Pro_3.0.0_amd64.AppImage` | Portable — `chmod +x` and run |
+| **Linux** (Debian/Ubuntu) | `File Converter Pro_3.0.0_amd64.deb` | `sudo dpkg -i` to install |
 
-1. Go to the **[Releases](https://github.com/dequaviousthe7th/File-Converter/releases)** page
-2. Download **`FCP-Setup.exe`**
-3. Run the installer and follow the setup wizard
-4. Launch the app from your desktop or Start Menu
+Everything is bundled — no separate ffmpeg or Pandoc installs, ever.
 
-That's it. The installer handles everything:
+## Trusted & secure
 
-- Installs the full application as a standalone program
-- Lets you choose between **Advanced UI** or **Simple UI** as your default
-- Optionally installs **ffmpeg** (audio/video) and **Pandoc** (documents) for you
-- Creates desktop and Start Menu shortcuts
-- Registers in Add/Remove Programs for easy uninstallation
-- Both UIs are always installed — switch between them anytime with the built-in switch button
-
-### Manual Installation (Developers)
-
-<details>
-<summary>Click to expand</summary>
-
-If you prefer to run from source:
-
-1. Clone the repository
-2. Make sure Python 3.8+ is installed
-3. Create a virtual environment and install dependencies:
-   ```bash
-   python -m venv venv
-   venv\Scripts\activate        # Windows
-   pip install -r requirements.txt
-   ```
-4. Run your preferred UI:
-   ```bash
-   python app.py               # Advanced UI
-   python app_simple.py        # Simple UI
-   ```
-
-Or on Windows, double-click `START.bat` (Advanced) or `START_SIMPLE.bat` (Simple).
-
-</details>
-
----
+- **Code-signed releases.** Windows installers are signed through [SignPath Foundation](https://signpath.org)'s free open-source signing program; macOS builds are signed with an Apple Developer ID and notarized by Apple. See [docs/SIGNING.md](docs/SIGNING.md) for the full signing setup.
+- **Checksums on every release.** Each release ships a `SHA256SUMS` file. Verify with `sha256sum -c SHA256SUMS` (Linux/macOS) or `certutil -hashfile <file> SHA256` (Windows).
+- **100% local processing.** Files never leave your machine. No uploads, no telemetry, no analytics, no network calls during conversion.
 
 ## Overview
 
-**File Converter Pro** is a desktop file conversion tool with **200+ conversion paths** across documents, images, audio, video, spreadsheets, and config files. Everything runs **100% locally** on your machine — no files are uploaded anywhere.
+File Converter Pro is a standalone desktop app that converts documents, images, audio, video, spreadsheets, and config files — **178+ conversion paths**, all processed locally. Version 3 is a ground-up rebuild: a Rust conversion engine inside a Tauri 2 shell, with a single premium dark UI (the old Advanced/Simple split is gone).
 
-Ships with two UI modes you can switch between at any time:
+<!-- SCREENSHOT: convert view -->
 
-| | Simple UI | Advanced UI |
-|--|-----------|-------------|
-| **Style** | Classic, lightweight | Modern dark studio theme |
-| **Best For** | Quick single conversions | Power users, batch workflows |
-| **Batch Mode** | Checkbox toggle | Dedicated page |
-| **History** | — | Full conversion history |
-| **Settings** | — | Output folder, quality, bitrate |
-| **Drag & Drop** | Yes | Yes |
-| **Kill Button** | Yes | Yes |
+<!-- SCREENSHOT: history view -->
 
----
+<!-- SCREENSHOT: settings view -->
 
-## Supported Formats
+## Supported formats
 
 ### Documents
 
@@ -104,34 +59,51 @@ Ships with two UI modes you can switch between at any time:
 |------|----|
 | PDF | DOCX, TXT, MD, PNG, JPG, HTML |
 | DOCX | PDF, TXT, MD, HTML |
+| MD | PDF, DOCX, TXT, HTML |
 | TXT | PDF, DOCX, MD |
-| Markdown | PDF, DOCX, TXT, HTML |
 | HTML | PDF, DOCX, TXT, MD |
 | RTF | PDF, DOCX, TXT |
-| EPUB | PDF, TXT |
+| EPUB | PDF, TXT, DOCX |
+
+> PDF → PNG/JPG renders the actual pages (every page, at your configured DPI) — no more text-preview stand-ins. PDF → DOCX/TXT/MD extracts text content; complex layouts are not preserved (true of every non-Acrobat tool).
 
 ### Images
 
 | From | To |
 |------|----|
-| PNG, JPG, JPEG | JPG/PNG, WEBP, BMP, PDF, TIFF, ICO, GIF |
-| WEBP, BMP, TIFF | PNG, JPG, WEBP, BMP, PDF, TIFF, GIF |
+| PNG | JPG, WEBP, BMP, PDF, TIFF, ICO, GIF |
+| JPG | PNG, WEBP, BMP, PDF, TIFF, ICO, GIF |
+| WEBP | PNG, JPG, BMP, PDF, TIFF, GIF |
+| BMP | PNG, JPG, WEBP, PDF, TIFF, GIF |
+| TIFF | PNG, JPG, WEBP, BMP, PDF, GIF |
 | GIF | PNG, JPG, WEBP, BMP, PDF |
 | ICO | PNG, JPG, BMP |
 | SVG | PNG, JPG, WEBP, PDF |
-| HEIC/HEIF | PNG, JPG, WEBP, BMP, PDF, TIFF |
+| HEIC | PNG, JPG, WEBP, BMP, PDF, TIFF |
 
-### Audio (requires ffmpeg)
+> `jpeg`, `tif`, `yml`, `heif`, and `htm` files are accepted as inputs and treated as their canonical formats.
 
-| From | To |
-|------|----|
-| MP3, WAV, FLAC, OGG, AAC, M4A, WMA | MP3, WAV, FLAC, OGG, AAC, M4A, WMA |
-
-### Video (requires ffmpeg)
+### Audio
 
 | From | To |
 |------|----|
-| MP4, AVI, MKV, MOV, WebM | MP4, AVI, MKV, MOV, WebM, GIF |
+| MP3 | WAV, FLAC, OGG, AAC, M4A, WMA |
+| WAV | MP3, FLAC, OGG, AAC, M4A |
+| FLAC | MP3, WAV, OGG, AAC, M4A |
+| OGG | MP3, WAV, FLAC, AAC, M4A |
+| AAC | MP3, WAV, FLAC, OGG, M4A |
+| M4A | MP3, WAV, FLAC, OGG, AAC |
+| WMA | MP3, WAV, FLAC, OGG, M4A |
+
+### Video
+
+| From | To |
+|------|----|
+| MP4 | AVI, MKV, MOV, WEBM, GIF |
+| AVI | MP4, MKV, MOV, WEBM, GIF |
+| MKV | MP4, AVI, MOV, WEBM, GIF |
+| MOV | MP4, AVI, MKV, WEBM, GIF |
+| WEBM | MP4, AVI, MKV, MOV, GIF |
 
 ### Data / Spreadsheets
 
@@ -149,21 +121,37 @@ Ships with two UI modes you can switch between at any time:
 | YAML | JSON, TOML |
 | TOML | JSON, YAML |
 
----
-
 ## Features
 
-- **200+ Conversion Paths** across 55+ file formats
-- **Dual UI Modes** — Switch between classic simple and modern dark theme anytime
-- **Batch Conversion** — Convert multiple files in a single queue
-- **Drag & Drop** — Drop files directly onto the window
-- **Kill Button** — Cancel any conversion instantly
-- **Real Progress** — Live progress reporting with status messages
-- **Conversion History** — Track all past conversions (Advanced UI)
-- **Configurable Settings** — Output folder, image quality, audio bitrate
-- **100% Local** — No internet required, no files uploaded anywhere
+- **Batch queue with per-file targets** — drop a mixed pile of files, pick a target per file (or apply to all compatible), convert the lot
+- **Real progress** — live per-file progress bars with status messages, including ffmpeg time-based progress for audio/video
+- **Cancel anytime** — per-file or all at once; no orphaned processes, partial outputs are cleaned up
+- **Conversion history** — every conversion recorded (single and batch), with open / show-in-folder actions
+- **Configurable** — output folder, after-conversion behavior, image quality, audio bitrate, PDF render DPI — all settings actually applied
+- **Drag & drop** — drop files straight onto the window
+- **Never overwrites** — outputs are uniquely named (`_converted`, then ` (1)`, ` (2)`, …)
+- **Dark premium UI** — custom titlebar, smooth motion, one focused workflow
+- **Auto-update ready** — updater infrastructure is wired for signed in-app updates
+- **100% local** — no internet required, no files uploaded anywhere
 
----
+## Building from source
+
+```bash
+git clone https://github.com/dequaviousthe7th/File-Converter.git
+cd File-Converter
+npm install
+bash scripts/fetch-sidecars.sh <your-target-triple>   # e.g. x86_64-unknown-linux-gnu
+npm run tauri dev
+```
+
+Full prerequisites (per OS), release builds, and engine tests: **[docs/BUILDING.md](docs/BUILDING.md)**.
+
+## Upgrading from v2
+
+Version 3 is a new engine with a new installer. If you have File Converter Pro 2.x installed:
+
+1. Uninstall v2 once via *Add/Remove Programs* (the old installer can't upgrade in place).
+2. Install v3. Your v2 settings and conversion history are automatically imported on first run.
 
 ## Contributing
 
@@ -173,11 +161,11 @@ Ships with two UI modes you can switch between at any time:
 4. Push to branch (`git push origin feature/new-feature`)
 5. Open a Pull Request
 
----
-
 ## License
 
 MIT License — see [LICENSE](LICENSE) for details.
+
+File Converter Pro bundles third-party tools that run as separate processes: **ffmpeg** (GPL), **pandoc** (GPL), **typst** (Apache-2.0), and the **pdfium** library. Their license texts, exact versions, and source links are in [licenses/README.md](licenses/README.md).
 
 ---
 
