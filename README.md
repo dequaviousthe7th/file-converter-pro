@@ -1,29 +1,31 @@
 <p align="center">
-  <img src="assets/logo.png" alt="File Converter Pro" width="120"/>
-</p>
-
-<h1 align="center">File Converter Pro</h1>
-
-<p align="center">
-  <b>Convert anything. Fast. Private. No uploads, no cloud, no limits.</b>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset=".github/readme/banner-dark.svg">
+    <img alt="File Converter Pro: convert anything, and nothing leaves your machine." src=".github/readme/banner-light.svg" width="100%">
+  </picture>
 </p>
 
 <p align="center">
-  <a href="https://github.com/dequaviousthe7th/File-Converter/releases/latest"><img src="https://img.shields.io/badge/Download-Latest%20Release-00d4aa?style=for-the-badge&logo=github&logoColor=white" alt="Download"/></a>
+  <b>A desktop converter for Windows, macOS and Linux. No uploads, no cloud, no limits.</b>
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Version-3.0.0-00d4aa.svg" alt="Version 3.0.0"/>
-  <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT"/>
-  <img src="https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg" alt="Platform"/>
-  <img src="https://img.shields.io/badge/Conversion%20Paths-158-00d4aa.svg" alt="158 Conversion Paths"/>
+  <a href="https://github.com/dequaviousthe7th/file-converter-pro/releases/latest"><b>Download</b></a> &nbsp;·&nbsp;
+  <a href="#supported-formats"><b>Formats</b></a> &nbsp;·&nbsp;
+  <a href="CHANGELOG.md"><b>Changelog</b></a> &nbsp;·&nbsp;
+  <a href="LICENSE"><b>MIT licence</b></a>
 </p>
 
----
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset=".github/readme/divider-dark.svg">
+    <img alt="" src=".github/readme/divider-light.svg" width="100%">
+  </picture>
+</p>
 
 ## Download
 
-Grab the latest release from the **[Releases](https://github.com/dequaviousthe7th/File-Converter/releases/latest)** page:
+Grab the latest release from the **[Releases](https://github.com/dequaviousthe7th/file-converter-pro/releases/latest)** page:
 
 | OS | Download | Notes |
 |----|----------|-------|
@@ -45,12 +47,6 @@ separate ffmpeg or Pandoc installs, ever.
 ## Overview
 
 File Converter Pro is a standalone desktop app that converts documents, images, audio, video, spreadsheets, and config files — **158 conversion paths**, all processed locally. Version 3 is a ground-up rebuild: a Rust conversion engine inside a Tauri 2 shell, with a single premium dark UI (the old Advanced/Simple split is gone).
-
-<!-- SCREENSHOT: convert view -->
-
-<!-- SCREENSHOT: history view -->
-
-<!-- SCREENSHOT: settings view -->
 
 ## Supported formats
 
@@ -138,8 +134,8 @@ File Converter Pro is a standalone desktop app that converts documents, images, 
 ## Building from source
 
 ```bash
-git clone https://github.com/dequaviousthe7th/File-Converter.git
-cd File-Converter
+git clone https://github.com/dequaviousthe7th/file-converter-pro.git
+cd file-converter-pro
 npm install
 bash scripts/fetch-sidecars.sh <your-target-triple>   # e.g. x86_64-unknown-linux-gnu
 npm run tauri dev
@@ -172,4 +168,10 @@ File Converter Pro bundles third-party tools that run as separate processes: **f
 
 <p align="center">
   <b>Built by <a href="https://github.com/dequaviousthe7th">Dequavious</a></b>
+</p>
+
+---
+
+<p align="center">
+  <sub>Built by <a href="https://dequavious.dev"><b>Khaled Jamal</b></a>, known online as Dequavious. Founder of <a href="https://usehelm.host">Helm</a>.</sub>
 </p>
