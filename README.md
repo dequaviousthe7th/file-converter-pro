@@ -30,8 +30,8 @@ Grab the latest release from the **[Releases](https://github.com/dequaviousthe7t
 | OS | Download | Notes |
 |----|----------|-------|
 | **Windows** (10/11, x64) | the `…-setup.exe` installer | Per-user install — no admin rights needed |
-| **macOS** (Apple Silicon) | the `…_aarch64.dmg` | Signed & notarized by Apple |
-| **macOS** (Intel) | the `…_x64.dmg` | Signed & notarized by Apple |
+| **macOS** (Apple Silicon) | the `…_aarch64.dmg` | Unsigned, see [opening it on a Mac](#opening-it-the-first-time) |
+| **macOS** (Intel) | the `…_x64.dmg` | Unsigned, see [opening it on a Mac](#opening-it-the-first-time) |
 | **Linux** | the `.AppImage` | Portable — `chmod +x` and run |
 | **Linux** (Debian/Ubuntu) | the `.deb` | `sudo dpkg -i` to install |
 
@@ -40,9 +40,22 @@ separate ffmpeg or Pandoc installs, ever.
 
 ## Trusted & secure
 
-- **Code-signed releases.** Windows installers are signed through [SignPath Foundation](https://signpath.org)'s free open-source signing program; macOS builds are signed with an Apple Developer ID and notarized by Apple. See [docs/SIGNING.md](docs/SIGNING.md) for the full signing setup.
+- **Unsigned for now.** v3.0.0 isn't code-signed yet, so Windows and macOS will warn you the first time. The signing pipeline is in place ([docs/SIGNING.md](docs/SIGNING.md)), and signed builds will follow.
 - **Checksums on every release.** Each release ships a `SHA256SUMS` file. Verify with `sha256sum -c SHA256SUMS` (Linux/macOS) or `certutil -hashfile <file> SHA256` (Windows).
 - **100% local processing.** Files never leave your machine. No uploads, no telemetry, no analytics, no network calls during conversion.
+
+## Opening it the first time
+
+Because v3.0.0 isn't signed yet, your system asks you to confirm once.
+
+- **Windows:** if SmartScreen appears, click **More info**, then **Run anyway**.
+- **macOS:** open the app once, then go to **System Settings › Privacy & Security** and click **Open Anyway**. If macOS says the app is damaged, run this once in Terminal after moving it to Applications:
+
+```bash
+xattr -dr com.apple.quarantine "/Applications/File Converter Pro.app"
+```
+
+Check your download against `SHA256SUMS` on the release page first, so you know it's the file that was built.
 
 ## Overview
 
@@ -128,7 +141,7 @@ File Converter Pro is a standalone desktop app that converts documents, images, 
 - **Drag & drop** — drop files straight onto the window
 - **Never overwrites** — outputs are uniquely named (`_converted`, then ` (1)`, ` (2)`, …)
 - **Dark premium UI** — custom titlebar, smooth motion, one focused workflow
-- **Auto-update ready** — updater infrastructure is wired for signed in-app updates
+- **Auto-update ready** — updater infrastructure is wired for in-app updates once releases are signed
 - **100% local** — no internet required, no files uploaded anywhere
 
 ## Building from source

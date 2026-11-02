@@ -14,8 +14,9 @@ Rust conversion engine behind a thin shell, with a single premium React UI.
 
 - Fully standalone: ffmpeg, pandoc, and typst are bundled as sidecars, pdfium as a
   resource — no external tool installs, no winget prompts, works on a bare machine
-- Signed releases: Windows installers via SignPath Foundation, macOS builds signed and
-  notarized with an Apple Developer ID, GPG-signed `SHA256SUMS` on Linux
+- Signing pipeline for future releases: SignPath Foundation for Windows, an Apple
+  Developer ID with notarization for macOS, and GPG for Linux. v3.0.0 itself ships
+  unsigned, with `SHA256SUMS` for every file
 - Real PDF → PNG/JPG: pages are actually rendered (all pages, configurable DPI)
 - EPUB → DOCX conversion path
 - Per-file target pickers in the batch queue, with "apply to all compatible"
