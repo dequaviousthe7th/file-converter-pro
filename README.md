@@ -186,5 +186,5 @@ File Converter Pro bundles third-party tools that run as separate processes: **f
 ---
 
 <p align="center">
-  <sub>Built by <a href="https://dequavious.dev"><b>Khaled Jamal</b></a>, known online as Dequavious. Founder of <a href="https://usehelm.host">Helm</a>.</sub>
+  <sub>Built by <a href="https://khaledjamal.dev"><b>Khaled Jamal</b></a>, known online as Dequavious. Founder of <a href="https://usehelm.host">Helm</a>.</sub>
 </p>
